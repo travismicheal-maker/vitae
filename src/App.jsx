@@ -11,9 +11,22 @@ Label ALL information: [Verified] for recognized guidelines (ACC/AHA, USPSTF, CD
 Rules: Never diagnose or prescribe. Cite specific guidelines by name + year. Explain lab values with reference ranges. Recommend professional consultation for all medical decisions.
 End every response with: "⚕ Educational only — consult your healthcare provider."`;
 
-const ANALYZE_PROMPT = `You are a medical document analyzer. Analyze this medical document and return ONLY valid JSON — no markdown, no explanation.
-Return exactly: {"title":"document title","type":"lab OR imaging OR note OR medication","date":"date found or null","provider":"provider name or null","flagged":true or false,"flagReason":"reason if flagged else null","values":["up to 6 key findings, each under 45 chars"]}
-flagged=true if you see HIGH/LOW/CRITICAL/ABNORMAL or values outside reference ranges.`;
+const ANALYZE_PROMPT = `You are a medical document analyzer. Analyze this medical document carefully.
+You MUST return a JSON object. Wrap it in triple backticks like this:
+\`\`\`json
+{"title":"...","type":"...","date":"...","provider":"...","flagged":true,"flagReason":"...","values":["..."]}
+\`\`\`
+
+Fields:
+- title: short document name (e.g. "Lipid Panel", "Cardiometabolic Report")
+- type: exactly one of: lab, imaging, note, medication
+- date: date collected/reported or null
+- provider: lab name or doctor name or null
+- flagged: true if ANY value is marked H, L, HIGH, LOW, CRITICAL, or outside reference range
+- flagReason: brief reason if flagged (e.g. "Lipoprotein(a) 180 nmol/L — High"), else null
+- values: array of up to 8 most important findings as short strings under 50 chars each
+
+For multi-page reports, summarize the most clinically significant findings.`;
 
 // ── This is the key change: calls YOUR server, not Anthropic directly ─────────
 const callAI = (body) =>
@@ -240,10 +253,20 @@ export default function Vitae() {
       const b64=await toBase64(file);
       const isPDF=file.type==='application/pdf';
       const blk=isPDF?{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}}:{type:'image',source:{type:'base64',media_type:file.type,data:b64}};
-      const r=await callAI({model:'claude-sonnet-4-20250514',max_tokens:500,system:ANALYZE_PROMPT,messages:[{role:'user',content:[blk,{type:'text',text:'Analyze this medical document and return the JSON.'}]}]});
+      const r=await callAI({model:'claude-sonnet-4-20250514',max_tokens:1000,system:ANALYZE_PROMPT,messages:[{role:'user',content:[blk,{type:'text',text:'Analyze this medical document and return the JSON object.'}]}]});
       const d=await r.json();
+      if(d.error){throw new Error(d.error.message||'API error');}
       const txt=d.content?.[0]?.text||'';
-      let p;try{p=JSON.parse(txt.replace(/```json|```/g,'').trim());}catch{throw new Error('Could not read document — try a clearer image');}
+      // Try multiple extraction strategies
+      let p=null;
+      // Strategy 1: extract JSON from code block
+      const codeMatch=txt.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if(codeMatch){try{p=JSON.parse(codeMatch[1].trim());}catch{}}
+      // Strategy 2: find the { } object anywhere in the text
+      if(!p){const objMatch=txt.match(/\{[\s\S]*\}/);if(objMatch){try{p=JSON.parse(objMatch[0]);}catch{}}}
+      // Strategy 3: try the whole text
+      if(!p){try{p=JSON.parse(txt.trim());}catch{}}
+      if(!p){throw new Error('Analysis failed — please try again or upload a clearer file');}
       const sty=TYPE_STYLE[p.type]||TYPE_STYLE.note;
       setUploads(prev=>[{id:Date.now(),isNew:true,type:p.type||'note',name:p.title||file.name,date:p.date||new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),provider:p.provider||'Uploaded',flagged:!!p.flagged,flagReason:p.flagReason||null,values:p.values||['Document uploaded'],color:sty.color,iconColor:sty.iconColor},...prev]);
       setPage('records');setFilter('All');toast2(`✓ ${p.title||file.name} added`);
