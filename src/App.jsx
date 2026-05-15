@@ -5,11 +5,22 @@
 import { useState, useRef, useEffect } from "react";
 import { Home, FolderOpen, MessageSquare, User, FlaskConical, ScanLine, ClipboardList, Pill, Send, AlertTriangle, CheckCircle2, XCircle, Heart, Upload, Bell, Lock, ExternalLink, ChevronRight, FileText, X, Loader } from "lucide-react";
 
-const makeChatPrompt = (name, dob) =>
-  `You are Vitae AI, a personal health assistant${name ? ` for ${name}` : ''}${dob ? `, DOB ${dob}` : ''}.
+const makeChatPrompt = (name, records) => {
+  // Build a summary of all uploaded records to inject as context
+  const recordContext = records && records.length > 0
+    ? `\n\nPATIENT RECORDS ON FILE (${records.length} total):\n` +
+      records.map((r, i) =>
+        `[Record ${i+1}] ${r.name} — Type: ${r.type} — Date: ${r.date || 'unknown'} — Provider: ${r.provider || 'unknown'}${r.flagged ? ' — ⚠ FLAGGED' : ''}${r.flagReason ? ` (${r.flagReason})` : ''}\nValues: ${(r.values || []).join(' | ')}`
+      ).join('\n')
+    : '\n\nNo records uploaded yet.';
+
+  return `You are Vitae AI, a personal health assistant${name ? ` for ${name}` : ''}.
 Label ALL information: [Verified] for recognized guidelines (ACC/AHA, USPSTF, CDC, NIH, ADA) | [Speculation] for interpretations | [Unknown] when unclear.
 Rules: Never diagnose or prescribe. Cite specific guidelines by name + year. Explain lab values with reference ranges. Recommend professional consultation for all medical decisions.
+You have full access to the patient's uploaded records listed below. When answering questions, refer to these records directly by name and explain the specific values. Do not ask the patient to paste or re-enter their results — you already have them.
+${recordContext}
 End every response with: "⚕ Educational only — consult your healthcare provider."`;
+};
 
 const ANALYZE_PROMPT = `You are a medical document analyzer. Analyze this medical document carefully.
 You MUST return a JSON object. Wrap it in triple backticks like this:
@@ -212,7 +223,7 @@ export default function Vitae() {
   const fileRef = useRef(null);
 
   useEffect(()=>{
-    if(name&&!msgs) setMsgs([{role:'assistant',content:`Hello **${name}**! I'm Vitae AI.\n\nUpload a medical record or ask me any health question. I'll give you evidence-based guidance with [Verified] citations from recognized clinical guidelines.\n\nWhat would you like to know?`}]);
+    if(name&&!msgs) setMsgs([{role:'assistant',content:`Hello **${name}**! I'm Vitae AI.\n\nUpload a medical record or ask me any health question. I'll give you evidence-based guidance with [Verified] citations from recognized clinical guidelines.\n\nOnce you upload records in the Records tab, I can see all your values and explain them — no copy-pasting needed.\n\nWhat would you like to know?`}]);
   },[name]);
   useEffect(()=>{endRef.current?.scrollIntoView({behavior:'smooth'});},[msgs,busy]);
 
@@ -229,7 +240,7 @@ export default function Vitae() {
     const h=[...(msgs||[]),{role:'user',content:m}];
     setMsgs(h);setInput('');setBusy(true);
     try{
-      const r=await callAI({model:'claude-sonnet-4-6',max_tokens:1000,system:makeChatPrompt(name),messages:h});
+      const r=await callAI({model:'claude-sonnet-4-6',max_tokens:1000,system:makeChatPrompt(name,uploads),messages:h});
       const d=await r.json();
       setMsgs(p=>[...p,{role:'assistant',content:d.content?.[0]?.text||'Error — try again.'}]);
     }catch{setMsgs(p=>[...p,{role:'assistant',content:'⚠ Connection error. Please try again.'}]);}
@@ -281,7 +292,7 @@ export default function Vitae() {
       <div className="hd">
         {page==='home'?<div className="logo"><Heart size={16} fill="#52B788" color="#52B788"/>Vitae</div>
           :<div><div className="ptitle">{{records:'My Records',ai:'AI Assistant',profile:'Profile'}[page]}</div>
-          <div className="psub">{{records:'Labs, imaging & notes',ai:'Evidence-based guidance',profile:name}[page]}</div></div>}
+          <div className="psub">{{records:'Labs, imaging & notes',ai:uploads.length>0?`Seeing ${uploads.length} uploaded record${uploads.length!==1?'s':''}` :'Upload records for full context',profile:name}[page]}</div></div>}
         <div style={{display:'flex',gap:7,alignItems:'center'}}>
           {page==='records'&&<button className="btn btnP btnsm" onClick={()=>!analyzing&&fileRef.current?.click()} disabled={analyzing}>
             {analyzing?<span className="spin"><Loader size={12}/></span>:<Upload size={12}/>}{analyzing?'Analyzing…':'Upload'}
