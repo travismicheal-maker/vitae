@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useState, useRef, useEffect } from "react";
-import { Home, FolderOpen, MessageSquare, User, FlaskConical, ScanLine, ClipboardList, Pill, Send, AlertTriangle, CheckCircle2, XCircle, Heart, Upload, Bell, Lock, ExternalLink, ChevronRight, FileText, X, Loader, Activity } from "lucide-react";
+import { Home, FolderOpen, MessageSquare, User, FlaskConical, ScanLine, ClipboardList, Pill, Send, AlertTriangle, CheckCircle2, XCircle, Heart, Upload, Bell, Lock, ExternalLink, ChevronRight, FileText, X, Loader, Mic, MicOff, Brain, Zap } from "lucide-react";
 
 const makeChatPrompt = (name, records) => {
   const ctx = records && records.length > 0
@@ -247,6 +247,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx)}
 .ci:focus{border-color:var(--g5);background:var(--surf)}
 .sb{width:44px;height:44px;border-radius:var(--rds);background:var(--g9);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
 .sb:hover:not(:disabled){background:var(--g7)}.sb:disabled{opacity:.4;cursor:not-allowed}
+.mic-btn{width:44px;height:44px;border-radius:var(--rds);background:var(--bg);color:var(--mu);border:1.5px solid var(--bd);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.mic-btn:hover{border-color:var(--g5);color:var(--g9)}
+.mic-btn.recording{background:#FEE2E2;border-color:#DC2626;color:#DC2626;animation:pulse-rec 1.2s ease-in-out infinite}
+.mic-btn.recording:hover{background:#FECACA}
+@keyframes pulse-rec{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.3)}50%{box-shadow:0 0 0 6px rgba(220,38,38,0)}}
+.model-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;margin-bottom:4px}
+.badge-opus{background:#EDE9FE;color:#5B21B6}
+.badge-sonnet{background:var(--g1);color:#065F46}
+.voice-hint{font-size:11px;color:var(--g7);text-align:center;padding:4px 0;animation:fU .2s ease}
+.transcript-preview{background:var(--g0);border:1px solid var(--g1);border-radius:var(--rds);padding:8px 12px;font-size:12.5px;color:var(--g9);margin-bottom:6px;line-height:1.5;animation:fU .15s ease}
 .disc{font-size:11px;color:#1D4ED8;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:7px 11px;margin-top:8px;line-height:1.55}
 .prow{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--bd);cursor:pointer}
 .prow:last-child{border-bottom:none}
@@ -452,26 +462,55 @@ function RecordsContent({uploads, setUploads, analyzing, setAnalyzing, filter, s
   );
 }
 
-function ChatContent({msgs, busy, input, setInput, send, QUICK_QS, endRef, isMobile}) {
+function ChatContent({msgs, busy, input, setInput, send, QUICK_QS, endRef, isMobile, recording, toggleVoice, voiceHint, lastModel}) {
   return (
     <>
       <div className={isMobile?'mob-msgs':'desk-msgs'}>
         {(msgs||[]).map((m,i)=>(
           <div key={i} className={`${isMobile?'msg':'desk-msg'} ${m.role==='user'?'u':'a'} fu`}>
-            <div className="mrole">{m.role==='user'?'You':'Vitae AI'}</div>
+            <div className="mrole" style={{display:'flex',alignItems:'center',gap:6}}>
+              {m.role==='user'?'You':'Vitae AI'}
+              {m.role==='assistant' && m._model?.includes('opus') && (
+                <span className="model-badge badge-opus"><Brain size={9}/>Deep analysis · Opus</span>
+              )}
+              {m.role==='assistant' && m._model && !m._model.includes('opus') && (
+                <span className="model-badge badge-sonnet"><Zap size={9}/>Sonnet</span>
+              )}
+            </div>
             {m.role==='user'?<div className="mb">{m.content}</div>:<div className="mb" dangerouslySetInnerHTML={{__html:renderMd(m.content)}}/>}
           </div>
         ))}
-        {busy&&<div className={`${isMobile?'msg':'desk-msg'} a fu`}><div className="mrole">Vitae AI</div><div className="dots"><div className="dot"/><div className="dot"/><div className="dot"/></div></div>}
+        {busy&&(
+          <div className={`${isMobile?'msg':'desk-msg'} a fu`}>
+            <div className="mrole" style={{display:'flex',alignItems:'center',gap:6}}>
+              Vitae AI
+              {lastModel==='opus'
+                ? <span className="model-badge badge-opus"><Brain size={9}/>Thinking deeply…</span>
+                : <span className="model-badge badge-sonnet"><Zap size={9}/>Searching…</span>
+              }
+            </div>
+            <div className="dots"><div className="dot"/><div className="dot"/><div className="dot"/></div>
+          </div>
+        )}
         <div ref={endRef}/>
       </div>
       <div className={isMobile?'mob-cbot':'desk-cbot'}>
         <div className={isMobile?'':' desk-cbot-inner'}>
           <div className="qrow">{QUICK_QS.map(q=><button key={q} className="qc" onClick={()=>send(q)}>{q}</button>)}</div>
+          {voiceHint && <div className="voice-hint">{recording ? '🔴 ' : ''}{voiceHint}</div>}
+          {input && recording && <div className="transcript-preview">"{input}"</div>}
           <div className={isMobile?'mob-irow':'desk-irow'}>
+            <button
+              className={`mic-btn ${recording?'recording':''}`}
+              onClick={toggleVoice}
+              title={recording?'Stop recording':'Start voice input'}
+              aria-label={recording?'Stop recording':'Tap to speak'}
+            >
+              {recording ? <MicOff size={17}/> : <Mic size={17}/>}
+            </button>
             <textarea className="ci" value={input} onChange={e=>setInput(e.target.value)}
               onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
-              placeholder="Ask any health question…" rows={1}/>
+              placeholder="Ask any health question — or tap the mic to speak…" rows={1}/>
             <button className="sb" onClick={()=>send()} disabled={busy||!input.trim()}><Send size={16}/></button>
           </div>
           <div className="disc">⚕ Educational only — not a substitute for professional medical advice.</div>
@@ -526,6 +565,12 @@ export default function Vitae() {
   const [analyzing, setAnalyzing] = useState(false);
   const [toast,     setToast]     = useState(null);
   const [drag,      setDrag]      = useState(false);
+  // Voice state
+  const [recording,  setRecording]  = useState(false);
+  const [voiceHint,  setVoiceHint]  = useState('');
+  const [lastModel,  setLastModel]  = useState('sonnet'); // 'sonnet' | 'opus'
+  const recognitionRef = useRef(null);
+  const mediaRecRef    = useRef(null);
   const endRef  = useRef(null);
   const fileRef = useRef(null);
 
@@ -535,6 +580,110 @@ export default function Vitae() {
   useEffect(()=>{endRef.current?.scrollIntoView({behavior:'smooth'});},[msgs,busy]);
 
   const toast2=(msg,err=false)=>{setToast({msg,err});setTimeout(()=>setToast(null),3500);};
+
+  // ── Voice recording ──────────────────────────────────────────────────────────
+  const startVoice = () => {
+    // Try Web Speech API first (Chrome, Edge, Safari)
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous      = false;
+      recognition.interimResults  = true;
+      recognition.lang            = 'en-US';
+      recognitionRef.current      = recognition;
+
+      recognition.onstart = () => {
+        setRecording(true);
+        setVoiceHint('Listening… speak your question');
+      };
+
+      recognition.onresult = (e) => {
+        const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+        setInput(transcript);
+        if (e.results[e.results.length - 1].isFinal) {
+          setVoiceHint('Got it — tap send or keep talking');
+        }
+      };
+
+      recognition.onerror = (e) => {
+        setRecording(false);
+        setVoiceHint('');
+        if (e.error !== 'aborted') toast2('Microphone error: ' + e.error, true);
+      };
+
+      recognition.onend = () => {
+        setRecording(false);
+        setVoiceHint('');
+        recognitionRef.current = null;
+      };
+
+      recognition.start();
+      return;
+    }
+
+    // Fallback: MediaRecorder → OpenAI Whisper
+    if (!navigator.mediaDevices?.getUserMedia) {
+      toast2('Voice input not supported in this browser. Try Chrome or Edge.', true);
+      return;
+    }
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      const chunks = [];
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+      const rec = new MediaRecorder(stream, { mimeType });
+      mediaRecRef.current = rec;
+
+      rec.ondataavailable = e => chunks.push(e.data);
+      rec.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        setVoiceHint('Transcribing…');
+        try {
+          const blob   = new Blob(chunks, { type: mimeType });
+          const b64    = await new Promise((res, rej) => {
+            const r = new FileReader();
+            r.onload  = () => res(r.result.split(',')[1]);
+            r.onerror = rej;
+            r.readAsDataURL(blob);
+          });
+          const resp = await fetch('/api/transcribe', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ audio: b64, mimeType }),
+          });
+          const data = await resp.json();
+          if (data.transcript) setInput(data.transcript);
+          else toast2(data.error || 'Could not transcribe audio', true);
+        } catch {
+          toast2('Transcription failed — please try again', true);
+        } finally {
+          setRecording(false);
+          setVoiceHint('');
+          mediaRecRef.current = null;
+        }
+      };
+
+      rec.start();
+      setRecording(true);
+      setVoiceHint('Recording… tap mic again to stop');
+    }).catch(() => {
+      toast2('Microphone access denied', true);
+    });
+  };
+
+  const stopVoice = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+    }
+    if (mediaRecRef.current && mediaRecRef.current.state !== 'inactive') {
+      mediaRecRef.current.stop();
+    }
+    setRecording(false);
+    setVoiceHint('');
+  };
+
+  const toggleVoice = () => recording ? stopVoice() : startVoice();
 
   const analyze=async(file)=>{
     if(analyzing)return;
@@ -578,9 +727,11 @@ export default function Vitae() {
         messages:h,
       });
       const d=await r.json();
-      // Use mergedText (combines all text blocks after web search tool use)
+      // Track which model was used (returned in _meta)
+      if(d._meta?.model?.includes('opus')) setLastModel('opus');
+      else setLastModel('sonnet');
       const reply = d.mergedText || d.content?.[0]?.text || 'Error — try again.';
-      setMsgs(p=>[...p,{role:'assistant',content:reply}]);
+      setMsgs(p=>[...p,{role:'assistant',content:reply, _model: d._meta?.model}]);
     }catch{setMsgs(p=>[...p,{role:'assistant',content:'⚠ Connection error. Please try again.'}]);}
     finally{setBusy(false);}
   };
@@ -593,7 +744,7 @@ export default function Vitae() {
   const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   const NAV=[{id:'home',lbl:'Home',I:Home},{id:'records',lbl:'Records',I:FolderOpen},{id:'ai',lbl:'AI',I:MessageSquare},{id:'profile',lbl:'Profile',I:User}];
 
-  const sharedProps = {uploads,setUploads,analyzing,setAnalyzing,filter,setFilter,allRecs,filtered,setPage,setInput,fileRef,toast2,drag,setDrag,msgs,busy,input,send,endRef,name,initials,setName,flagCount};
+  const sharedProps = {uploads,setUploads,analyzing,setAnalyzing,filter,setFilter,allRecs,filtered,setPage,setInput,fileRef,toast2,drag,setDrag,msgs,busy,input,send,endRef,name,initials,setName,flagCount,recording,toggleVoice,voiceHint,lastModel};
 
   return (
     <>
