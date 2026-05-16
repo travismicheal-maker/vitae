@@ -52,12 +52,18 @@ You use the GRADE system (Grading of Recommendations, Assessment, Development an
    - RIGHT: "[Verified — High] ACC/AHA 2019 guidelines recommend..."
    - RIGHT: "[Verified — Moderate] A 2023 Cochrane meta-analysis of 24 RCTs found..."
 
-## RULES:
-- Never diagnose or prescribe — interpret and educate only
-- Always recommend professional consultation for clinical decisions
-- When evidence conflicts between guidelines (e.g. AHA vs ESC), note the discrepancy
-- For emerging or controversial topics, present the evidence on both sides with GRADE quality ratings
-- Lipoprotein(a) >125 nmol/L is always a high-risk finding regardless of LDL — flag this explicitly
+## FORMATTING RULES — FOLLOW EXACTLY:
+- Never use ## or ### headings — use plain bold text for section labels instead
+- Never use --- or *** dividers
+- Use plain bullet points (- ) for lists
+- Keep responses clear and readable without markdown symbols showing through
+- Always end with a References section listing every source cited, formatted EXACTLY like this:
+
+References:
+- Source name or author, year. https://full-url-here.com
+- Source name or author, year. https://full-url-here.com
+
+Include the full URL on the same line as the source label, separated by a period and space. Only include sources you actually searched or cited.
 
 ${ctx}
 
@@ -91,17 +97,85 @@ const QUICK_QS = ['What does the evidence say about my flagged results?','Latest
 
 function renderMd(t) {
   if(!t) return '';
-  return t
+
+  // ── Extract references/citations before rendering ──────────────────────────
+  // Captures lines like: "1. Smith et al. https://..." or "- ACC/AHA https://..."
+  const refLines = [];
+  const refRegex = /^[\-\*\d]+[\.\)]\s+(.+?)(https?:\/\/[^\s\)]+)/gm;
+  let m;
+  while((m = refRegex.exec(t)) !== null) {
+    refLines.push({ label: m[1].trim().replace(/\*\*/g,''), url: m[2].trim() });
+  }
+
+  // ── Clean and convert markdown ─────────────────────────────────────────────
+  let html = t
+    // Escape HTML
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+
+    // Remove horizontal rules (--- or ***)
+    .replace(/^[\-\*_]{3,}\s*$/gm, '')
+
+    // Convert ## headings → styled spans (not big headers)
+    .replace(/^#{1,3}\s+(.+)$/gm, '<div style="font-weight:600;font-size:13.5px;color:var(--g9);margin:12px 0 5px">$1</div>')
+
+    // Bold
     .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\[Verified\s*—\s*High\]/g,'<span style="background:#D1FAE5;color:#065F46;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700">[Verified — High]</span>')
-    .replace(/\[Verified\s*—\s*Moderate\]/g,'<span style="background:#DBEAFE;color:#1E40AF;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700">[Verified — Moderate]</span>')
-    .replace(/\[Verified\s*—\s*Low\]/g,'<span style="background:#FEF9C3;color:#854D0E;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700">[Verified — Low]</span>')
-    .replace(/\[Verified\]/g,'<span style="background:#D1FAE5;color:#065F46;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700">[Verified]</span>')
-    .replace(/\[Speculation\]/g,'<span style="background:#FEF3CD;color:#92400E;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700">[Speculation]</span>')
-    .replace(/\[Unknown\]/g,'<span style="background:#F3F4F6;color:#4B5563;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700">[Unknown]</span>')
-    .replace(/⚕(.*?)$/gm,'<div style="margin-top:10px;padding:8px 11px;background:#EFF6FF;border-radius:6px;font-size:11px;color:#1D4ED8;border:1px solid #BFDBFE">⚕$1</div>')
-    .replace(/\n\n/g,'<br/><br/>').replace(/\n/g,'<br/>');
+
+    // Italic
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+
+    // GRADE labels — color-coded badges
+    .replace(/\[Verified\s*—\s*High\]/g,   '<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap">[Verified — High]</span>')
+    .replace(/\[Verified\s*—\s*Moderate\]/g,'<span style="background:#DBEAFE;color:#1E40AF;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap">[Verified — Moderate]</span>')
+    .replace(/\[Verified\s*—\s*Low\]/g,    '<span style="background:#FEF9C3;color:#854D0E;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap">[Verified — Low]</span>')
+    .replace(/\[Verified\]/g,              '<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap">[Verified]</span>')
+    .replace(/\[Speculation\]/g,           '<span style="background:#FEF3CD;color:#92400E;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap">[Speculation]</span>')
+    .replace(/\[Unknown\]/g,               '<span style="background:#F3F4F6;color:#4B5563;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap">[Unknown]</span>')
+
+    // Inline URLs → clickable links (before bullet processing)
+    .replace(/(https?:\/\/[^\s<\)&]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#1D4ED8;text-decoration:underline;font-size:11px;word-break:break-all">$1</a>')
+
+    // Bullet lists — lines starting with - or *
+    .replace(/^[\-\*]\s+(.+)$/gm, '<div style="display:flex;gap:7px;margin:3px 0"><span style="color:var(--g5);flex-shrink:0;margin-top:1px">•</span><span>$1</span></div>')
+
+    // Numbered lists
+    .replace(/^\d+\.\s+(.+)$/gm, (match, content, offset, str) => {
+      const num = match.match(/^(\d+)/)[1];
+      return `<div style="display:flex;gap:8px;margin:3px 0"><span style="color:var(--mu);flex-shrink:0;font-size:11px;margin-top:2px;min-width:14px">${num}.</span><span>${content}</span></div>`;
+    })
+
+    // Disclaimer line
+    .replace(/⚕(.*?)$/gm,'<div style="margin-top:12px;padding:8px 12px;background:#EFF6FF;border-radius:7px;font-size:11.5px;color:#1E40AF;border:1px solid #BFDBFE;line-height:1.5">⚕$1</div>')
+
+    // Paragraphs — double newline
+    .replace(/\n\n/g,'</p><p style="margin:8px 0">')
+
+    // Single newlines
+    .replace(/\n/g,'<br/>');
+
+  html = `<p style="margin:0">${html}</p>`;
+
+  // ── Build references section ───────────────────────────────────────────────
+  if(refLines.length > 0) {
+    const refs = refLines.map((r,i) =>
+      `<div style="display:flex;gap:7px;margin:4px 0;align-items:flex-start">
+        <span style="color:var(--mu);font-size:10px;flex-shrink:0;margin-top:2px">${i+1}.</span>
+        <div>
+          <span style="font-size:11.5px;color:var(--tx)">${r.label.replace(/[:\-,]+$/,'').trim()}</span><br/>
+          <a href="${r.url}" target="_blank" rel="noopener noreferrer"
+             style="font-size:10.5px;color:#1D4ED8;text-decoration:underline;word-break:break-all">${r.url}</a>
+        </div>
+      </div>`
+    ).join('');
+
+    html += `
+      <div style="margin-top:14px;padding:11px 13px;background:#F8F7F5;border:1px solid var(--bd);border-radius:8px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--mu);margin-bottom:8px">References</div>
+        ${refs}
+      </div>`;
+  }
+
+  return html;
 }
 function toBase64(file) {
   return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=()=>rej(new Error('Read failed'));r.readAsDataURL(file);});
