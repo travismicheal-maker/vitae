@@ -8,66 +8,44 @@ const makeChatPrompt = (name, records) => {
       records.map((r,i)=>`[Record ${i+1}] ${r.name} — ${r.type} — ${r.date||'unknown date'} — ${r.provider||'unknown provider'}${r.flagged?' — ⚠ FLAGGED':''}${r.flagReason?` (${r.flagReason})`:''}\nValues: ${(r.values||[]).join(' | ')}`).join('\n')
     : '\n\nNo records uploaded yet.';
 
-  return `You are Vitae AI — a clinical-grade personal health assistant${name?` for ${name}`:''}.
+  return `You are the world's foremost physician and diagnostician — a rare combination of an internist, clinical pharmacologist, and translational researcher with the depth of a subspecialist in every domain. You have immediate access to the entirety of medical literature, all current major clinical guidelines, and the reasoning patterns of the world's best clinicians.
 
-## YOUR CORE APPROACH: GRADE Evidence Framework
+You communicate as a senior attending physician consulting with a highly capable colleague. Your tone is direct, collegial, intellectually rigorous, and clinically precise — the way a department chief at a top academic medical center would speak to a fellow or junior attending. You do not oversimplify, but you explain your reasoning clearly.
 
-You use the GRADE system (Grading of Recommendations, Assessment, Development and Evaluations) — the international standard used by Cochrane, WHO, NICE, AHA, ACC, ADA, and 100+ medical organizations — to evaluate and communicate the quality of all clinical evidence.
+IDENTITY:
+- You integrate findings the way a clinician builds a differential: systematically, probabilistically, with explicit reasoning about pre-test probability, Bayesian updating, and clinical significance.
+- You proactively surface findings the user may not have asked about — the way a good consultant would flag a drug interaction or a pattern the ordering physician might have missed.
+- You distinguish between what the data shows, what it suggests, and what remains uncertain.
 
-### GRADE Evidence Quality Labels (use these EXACTLY in every response):
+GRADE EVIDENCE FRAMEWORK:
+Use GRADE labeling on every clinically significant claim:
+[Verified — High] RCTs, strong systematic reviews, major guideline consensus
+[Verified — Moderate] RCTs with limitations, strong cohort data
+[Verified — Low] Observational data, case series, mechanistic extrapolation
+[Speculation] Clinical reasoning without direct trial support — label explicitly
+[Unknown] Conflicting or absent evidence — say so directly
 
-**[Verified — High]** Randomized controlled trials (RCTs) with consistent results. Strong systematic reviews. Example: statin therapy for LDL reduction, ACE inhibitors for hypertension.
+CLINICAL VOICE — FOLLOW THESE EXACTLY:
+- Open with your clinical impression or the key finding, not a preamble
+- Use correct medical terminology: do not substitute lay terms unless explaining to a patient is the explicit task
+- When interpreting labs: state the value, the assay method if relevant, the reference range, the guideline-based target, and your clinical read of the significance
+- Flag drug interactions, contraindications, and safety signals proactively
+- When appropriate, give a differential with relative probabilities
+- State your recommendation clearly — hedge appropriately but do not be evasive
+- Use web search to pull current guidelines and literature before responding to clinical questions
 
-**[Verified — Moderate]** RCTs with limitations, or strong observational studies. Example: specific dietary patterns for cardiovascular risk, omega-3s for triglycerides.
-
-**[Verified — Low]** Observational studies, case series, or extrapolated RCT data. State this explicitly. Example: many supplement interactions, some lifestyle interventions.
-
-**[Speculation]** Plausible clinical reasoning, expert consensus, or mechanistic arguments without direct trial evidence. Always label as such.
-
-**[Unknown]** Insufficient or conflicting evidence. Do not speculate — state clearly that the evidence is lacking or contested.
-
-### GRADE Recommendation Strength (always pair with evidence quality):
-- **Strong recommendation**: Benefits clearly outweigh risks across most patients — use language like "the evidence strongly supports..."
-- **Conditional recommendation**: Benefits probably outweigh risks but depends on patient context — use language like "for most patients, however individual factors matter..."
-- **No recommendation possible**: Insufficient evidence — say so directly.
-
-## HOW TO ANSWER EVERY QUESTION:
-
-1. **Use web search first** when asked about clinical topics, treatments, guidelines, or research. Search PubMed, Cochrane, ACC/AHA guidelines, WHO, NICE before responding. Always prefer the most recent systematic review or major guideline.
-
-2. **Structure your responses** with:
-   - The evidence quality label (GRADE tier) for every key claim
-   - The specific source: guideline name, year, and organization (e.g. "ACC/AHA 2019 Cardiovascular Risk Guidelines")
-   - The recommendation strength (strong vs conditional)
-   - How it applies to this patient's specific values if records are on file
-
-3. **For lab interpretation**: Compare to reference ranges AND to guideline-based treatment targets. Example for LDL: report the value, the standard reference range, AND the ACC/AHA risk-stratified target (<100 for primary prevention, <70 for high risk, <55 for very high risk).
-
-4. **For questions without lab data**: Answer fully using GRADE-graded evidence. Do not refuse or deflect — provide the best available evidence with appropriate uncertainty labels.
-
-5. **Never ask the patient to paste their results** — you have full access to their uploaded records below.
-
-6. **Cite specific sources**, not vague references:
-   - WRONG: "Studies show that..."
-   - RIGHT: "[Verified — High] ACC/AHA 2019 guidelines recommend..."
-   - RIGHT: "[Verified — Moderate] A 2023 Cochrane meta-analysis of 24 RCTs found..."
-
-## FORMATTING RULES — FOLLOW EXACTLY:
-- Never use ## or ### headings — use plain bold text for section labels instead
-- Never use --- or *** dividers
-- Use plain bullet points (- ) for lists
-- Keep responses clear and readable without markdown symbols showing through
-- Always end with a References section listing every source cited, formatted EXACTLY like this:
+FORMATTING:
+- Use bold text for key terms, diagnoses, drug names, and section labels — never ## headings
+- Use numbered lists for differentials and ordered steps; bullets for findings and recommendations
+- No horizontal dividers (--- or ***)
+- End every response with a References section formatted exactly as:
 
 References:
-- Source name or author, year. https://full-url-here.com
-- Source name or author, year. https://full-url-here.com
-
-Include the full URL on the same line as the source label, separated by a period and space. Only include sources you actually searched or cited.
+- Author/Organization, Year. https://url
 
 ${ctx}
 
-End every response with: "⚕ Educational only — consult your healthcare provider for clinical decisions."`;
+End with: "⚕ For educational and clinical decision-support purposes only. All management decisions should be made in the context of the full clinical picture by the treating clinician."`;
 };
 
 const ANALYZE_PROMPT = `You are a medical document analyzer. Analyze this document carefully.
@@ -98,83 +76,50 @@ const QUICK_QS = ['What does the evidence say about my flagged results?','Latest
 function renderMd(t) {
   if(!t) return '';
 
-  // ── Extract references/citations before rendering ──────────────────────────
-  // Captures lines like: "1. Smith et al. https://..." or "- ACC/AHA https://..."
+  // Extract references
   const refLines = [];
-  const refRegex = /^[\-\*\d]+[\.\)]\s+(.+?)(https?:\/\/[^\s\)]+)/gm;
+  const refRegex = /^[\-\*\d]+[\.\)]\s+(.+?)(https?:\/\/[^\s\)&]+)/gm;
   let m;
   while((m = refRegex.exec(t)) !== null) {
     refLines.push({ label: m[1].trim().replace(/\*\*/g,''), url: m[2].trim() });
   }
 
-  // ── Clean and convert markdown ─────────────────────────────────────────────
   let html = t
-    // Escape HTML
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-
-    // Remove horizontal rules (--- or ***)
     .replace(/^[\-\*_]{3,}\s*$/gm, '')
-
-    // Convert ## headings → styled spans (not big headers)
-    .replace(/^#{1,3}\s+(.+)$/gm, '<div style="font-weight:600;font-size:13.5px;color:var(--g9);margin:12px 0 5px">$1</div>')
-
-    // Bold
+    .replace(/^#{1,3}\s+(.+)$/gm, '<div class="md-section">$1</div>')
     .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-
-    // Italic
     .replace(/\*(.*?)\*/g,'<em>$1</em>')
-
-    // GRADE labels — color-coded badges
-    .replace(/\[Verified\s*—\s*High\]/g,   '<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap">[Verified — High]</span>')
-    .replace(/\[Verified\s*—\s*Moderate\]/g,'<span style="background:#DBEAFE;color:#1E40AF;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap">[Verified — Moderate]</span>')
-    .replace(/\[Verified\s*—\s*Low\]/g,    '<span style="background:#FEF9C3;color:#854D0E;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap">[Verified — Low]</span>')
-    .replace(/\[Verified\]/g,              '<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap">[Verified]</span>')
-    .replace(/\[Speculation\]/g,           '<span style="background:#FEF3CD;color:#92400E;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap">[Speculation]</span>')
-    .replace(/\[Unknown\]/g,               '<span style="background:#F3F4F6;color:#4B5563;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap">[Unknown]</span>')
-
-    // Inline URLs → clickable links (before bullet processing)
-    .replace(/(https?:\/\/[^\s<\)&]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#1D4ED8;text-decoration:underline;font-size:11px;word-break:break-all">$1</a>')
-
-    // Bullet lists — lines starting with - or *
-    .replace(/^[\-\*]\s+(.+)$/gm, '<div style="display:flex;gap:7px;margin:3px 0"><span style="color:var(--g5);flex-shrink:0;margin-top:1px">•</span><span>$1</span></div>')
-
-    // Numbered lists
-    .replace(/^\d+\.\s+(.+)$/gm, (match, content, offset, str) => {
+    .replace(/\[Verified\s*—\s*High\]/g,   '<span class="grade grade-high">[Verified — High]</span>')
+    .replace(/\[Verified\s*—\s*Moderate\]/g,'<span class="grade grade-mod">[Verified — Moderate]</span>')
+    .replace(/\[Verified\s*—\s*Low\]/g,    '<span class="grade grade-low">[Verified — Low]</span>')
+    .replace(/\[Verified\]/g,              '<span class="grade grade-high">[Verified]</span>')
+    .replace(/\[Speculation\]/g,           '<span class="grade grade-spec">[Speculation]</span>')
+    .replace(/\[Unknown\]/g,               '<span class="grade grade-unk">[Unknown]</span>')
+    .replace(/(https?:\/\/[^\s<\)&]+)/g,  '<a href="$1" target="_blank" rel="noopener noreferrer" class="md-link">$1</a>')
+    .replace(/^[\-\*]\s+(.+)$/gm,         '<div class="md-bullet"><span class="md-dot">•</span><span>$1</span></div>')
+    .replace(/^\d+\.\s+(.+)$/gm, (match, content) => {
       const num = match.match(/^(\d+)/)[1];
-      return `<div style="display:flex;gap:8px;margin:3px 0"><span style="color:var(--mu);flex-shrink:0;font-size:11px;margin-top:2px;min-width:14px">${num}.</span><span>${content}</span></div>`;
+      return `<div class="md-num"><span class="md-num-n">${num}.</span><span>${content}</span></div>`;
     })
-
-    // Disclaimer line
-    .replace(/⚕(.*?)$/gm,'<div style="margin-top:12px;padding:8px 12px;background:#EFF6FF;border-radius:7px;font-size:11.5px;color:#1E40AF;border:1px solid #BFDBFE;line-height:1.5">⚕$1</div>')
-
-    // Paragraphs — double newline
-    .replace(/\n\n/g,'</p><p style="margin:8px 0">')
-
-    // Single newlines
+    .replace(/⚕(.*?)$/gm,'<div class="md-disc">⚕$1</div>')
+    .replace(/\n\n/g,'</p><p class="md-p">')
     .replace(/\n/g,'<br/>');
 
-  html = `<p style="margin:0">${html}</p>`;
+  html = `<p class="md-p">${html}</p>`;
 
-  // ── Build references section ───────────────────────────────────────────────
   if(refLines.length > 0) {
     const refs = refLines.map((r,i) =>
-      `<div style="display:flex;gap:7px;margin:4px 0;align-items:flex-start">
-        <span style="color:var(--mu);font-size:10px;flex-shrink:0;margin-top:2px">${i+1}.</span>
+      `<div class="ref-row">
+        <span class="ref-num">${i+1}.</span>
         <div>
-          <span style="font-size:11.5px;color:var(--tx)">${r.label.replace(/[:\-,]+$/,'').trim()}</span><br/>
-          <a href="${r.url}" target="_blank" rel="noopener noreferrer"
-             style="font-size:10.5px;color:#1D4ED8;text-decoration:underline;word-break:break-all">${r.url}</a>
+          <span class="ref-label">${r.label.replace(/[:\-,]+$/,'').trim()}</span><br/>
+          <a href="${r.url}" target="_blank" rel="noopener noreferrer" class="ref-link">${r.url}</a>
         </div>
       </div>`
     ).join('');
-
-    html += `
-      <div style="margin-top:14px;padding:11px 13px;background:#F8F7F5;border:1px solid var(--bd);border-radius:8px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--mu);margin-bottom:8px">References</div>
-        ${refs}
-      </div>`;
+    html += `<div class="ref-box"><div class="ref-title">References</div>${refs}</div>`;
   }
-
   return html;
 }
 function toBase64(file) {
@@ -250,9 +195,53 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx)}
 .toast.err{background:#DC2626}
 .msg{max-width:80%}.msg.u{align-self:flex-end}.msg.a{align-self:flex-start}
 .mrole{font-size:10.5px;color:var(--mu);margin-bottom:4px;font-weight:500;letter-spacing:.3px}
-.mb{padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.65}
+.mb{padding:14px 16px;border-radius:14px;font-size:14px;line-height:1.72;font-family:'DM Sans',sans-serif}
 .msg.u .mb{background:var(--g9);color:#fff;border-bottom-right-radius:3px}
-.msg.a .mb{background:var(--surf);border:1px solid var(--bd);border-bottom-left-radius:3px;box-shadow:var(--sh)}
+.msg.a .mb{background:var(--surf);border:1px solid var(--bd);border-bottom-left-radius:3px;box-shadow:var(--sh);padding:16px 18px}
+
+/* Heidi-style clinical typography */
+.md-p{margin:0 0 10px}
+.md-p:last-child{margin-bottom:0}
+.md-section{font-weight:600;font-size:14px;color:var(--tx);margin:14px 0 6px;letter-spacing:-.1px}
+.md-bullet{display:flex;gap:9px;margin:5px 0;line-height:1.6}
+.md-dot{color:var(--g5);flex-shrink:0;margin-top:2px;font-size:15px;line-height:1.4}
+.md-num{display:flex;gap:9px;margin:5px 0;line-height:1.6}
+.md-num-n{color:var(--mu);flex-shrink:0;font-size:12px;margin-top:3px;min-width:16px;font-weight:500}
+.md-link{color:#1D4ED8;text-decoration:underline;font-size:11.5px;word-break:break-all}
+.md-disc{margin-top:14px;padding:10px 13px;background:#EFF6FF;border-radius:8px;font-size:12px;color:#1E40AF;border:1px solid #BFDBFE;line-height:1.6}
+.grade{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap;margin:0 2px;vertical-align:middle}
+.grade-high{background:#D1FAE5;color:#065F46}
+.grade-mod{background:#DBEAFE;color:#1E40AF}
+.grade-low{background:#FEF9C3;color:#854D0E}
+.grade-spec{background:#FEF3CD;color:#92400E}
+.grade-unk{background:#F3F4F6;color:#4B5563}
+.ref-box{margin-top:16px;padding:13px 15px;background:#FAFAF9;border:1px solid var(--bd);border-radius:10px}
+.ref-title{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--mu);margin-bottom:9px}
+.ref-row{display:flex;gap:8px;margin:6px 0;align-items:flex-start}
+.ref-num{color:var(--mu);font-size:10px;flex-shrink:0;margin-top:3px;min-width:14px;font-weight:500}
+.ref-label{font-size:12.5px;color:var(--tx);font-weight:500}
+.ref-link{font-size:10.5px;color:#1D4ED8;text-decoration:underline;word-break:break-all}
+
+/* Action bar below AI responses */
+.action-bar{display:flex;align-items:center;gap:4px;margin-top:8px;padding:2px 0;flex-wrap:wrap}
+.act-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;font-size:11.5px;border:none;background:none;color:var(--mu);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.act-btn:hover{background:var(--bg);color:var(--tx)}
+.act-btn.voted{color:var(--g9);background:var(--g0)}
+.act-sep{width:1px;height:14px;background:var(--bd);margin:0 2px;flex-shrink:0}
+
+/* Share modal */
+.share-modal{background:var(--surf);border-radius:16px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden}
+.share-hd{padding:18px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd)}
+.share-title{font-size:16px;font-weight:600;color:var(--tx)}
+.share-notice{margin:14px 16px;padding:10px 13px;background:#EFF6FF;border-radius:8px;font-size:12px;color:#1E40AF;line-height:1.55;border:1px solid #BFDBFE}
+.share-preview{margin:0 16px 14px;border:1px solid var(--bd);border-radius:10px;padding:13px;font-size:12.5px;color:var(--tx);line-height:1.6;max-height:130px;overflow:hidden;background:var(--bg);position:relative}
+.share-preview::after{content:'';position:absolute;bottom:0;left:0;right:0;height:36px;background:linear-gradient(transparent,var(--bg))}
+.share-copy-btn{display:block;width:calc(100% - 32px);margin:0 16px 12px;padding:13px;background:var(--g9);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
+.share-copy-btn:hover{background:var(--g7)}
+.share-socials{display:flex;justify-content:space-around;padding:10px 16px 18px;border-top:1px solid var(--bd)}
+.social-btn{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif}
+.social-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+.social-lbl{font-size:11px;color:var(--mu)}
 .dots{display:inline-flex;gap:4px;padding:11px 14px;background:var(--surf);border:1px solid var(--bd);border-radius:14px;border-bottom-left-radius:3px;align-self:flex-start}
 .dot{width:5px;height:5px;background:var(--mu);border-radius:50%;animation:bl 1.2s infinite}
 .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
@@ -367,6 +356,110 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx)}
 .s-btn{width:100%;padding:13px;background:var(--g9);color:#fff;border:none;border-radius:var(--rds);font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;transition:all .15s}
 .s-btn:hover{background:var(--g7)}.s-btn:disabled{opacity:.45;cursor:not-allowed}
 `;
+
+// ── Share Modal ───────────────────────────────────────────────────────────────
+function ShareModal({ content, onClose }) {
+  const [copied, setCopied] = useState(false);
+  const plain = content.replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
+  const shortText = plain.slice(0,200) + (plain.length > 200 ? '…' : '');
+
+  const copyLink = async () => {
+    try { await navigator.clipboard.writeText(window.location.href); }
+    catch { await navigator.clipboard.writeText(plain); }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const socials = [
+    { name:'LinkedIn', bg:'#0A66C2', color:'#fff', emoji:'in',
+      url:`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}` },
+    { name:'X',        bg:'#000',    color:'#fff', emoji:'𝕏',
+      url:`https://x.com/intent/tweet?text=${encodeURIComponent('Health insight from Vitae AI (powered by Bio Precision Aging): ' + shortText)}&url=${encodeURIComponent(window.location.href)}` },
+    { name:'Reddit',   bg:'#FF4500', color:'#fff', emoji:'R',
+      url:`https://reddit.com/submit?url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent('Health insight from Vitae AI')}` },
+    { name:'WhatsApp', bg:'#25D366', color:'#fff', emoji:'W',
+      url:`https://wa.me/?text=${encodeURIComponent('Health insight from Vitae AI: ' + shortText + ' ' + window.location.href)}` },
+  ];
+
+  return (
+    <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="share-modal">
+        <div className="share-hd">
+          <div className="share-title">Share</div>
+          <button className="modal-close" onClick={onClose}><X size={14}/></button>
+        </div>
+        <div className="share-notice">
+          ⓘ By sharing, confirm this content contains no sensitive or identifiable patient information.
+        </div>
+        <div className="share-preview">{shortText}</div>
+        <button className="share-copy-btn" onClick={copyLink}>
+          {copied ? '✓ Copied!' : '🔗 Copy link'}
+        </button>
+        <div className="share-socials">
+          {socials.map(s=>(
+            <a key={s.name} href={s.url} target="_blank" rel="noopener noreferrer" style={{textDecoration:'none'}}>
+              <div className="social-btn">
+                <div className="social-icon" style={{background:s.bg,color:s.color}}>{s.emoji}</div>
+                <span className="social-lbl">{s.name}</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── PDF Generation ────────────────────────────────────────────────────────────
+function generatePDF(content, question) {
+  const plain = content
+    .replace(/<div class="ref-box">[\s\S]*<\/div>/,'') // refs handled separately
+    .replace(/<[^>]+>/g,'\n')
+    .replace(/\n{3,}/g,'\n\n')
+    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+    .trim();
+
+  const now = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Vitae Clinical Analysis</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;font-size:13px;color:#111827;background:#fff;padding:48px;max-width:720px;margin:0 auto;line-height:1.7}
+  .header{border-bottom:2px solid #1B4332;padding-bottom:18px;margin-bottom:24px}
+  .brand{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#1B4332}
+  .brand-sub{font-size:11px;color:#6B7280;margin-top:3px;letter-spacing:.3px}
+  .date{font-size:11px;color:#6B7280;margin-top:8px}
+  .query-box{background:#F0FDF4;border-left:3px solid #52B788;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:22px;font-size:13px;color:#1B4332;font-style:italic}
+  .query-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#2D6A4F;margin-bottom:5px}
+  .body{white-space:pre-wrap;font-size:13px;line-height:1.75;color:#1F2937}
+  .footer{margin-top:32px;padding-top:14px;border-top:1px solid #E5E1D8;font-size:10.5px;color:#9CA3AF;line-height:1.6}
+  .powered{margin-top:8px;font-size:11px;color:#2D6A4F;font-weight:500}
+</style></head><body>
+<div class="header">
+  <div class="brand">Vitae Health AI</div>
+  <div class="brand-sub">Powered by Bio Precision Aging · bioprecisionaging.com</div>
+  <div class="date">Generated ${now}</div>
+</div>
+<div class="query-lbl">Clinical Query</div>
+<div class="query-box">${question || 'Clinical analysis'}</div>
+<div class="body">${plain}</div>
+<div class="footer">
+  This report was generated by Vitae AI, a clinical decision-support tool powered by Claude AI and grounded in GRADE evidence methodology.<br/>
+  For educational and clinical decision-support purposes only. All management decisions should be made in the context of the full clinical picture by the treating clinician.
+  <div class="powered">Bio Precision Aging · bioprecisionaging.com</div>
+</div>
+</body></html>`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, '_blank');
+  if(win) {
+    win.onload = () => { win.print(); };
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
 
 // ── Paste / Free Text Modal ───────────────────────────────────────────────────
 const PASTE_TYPES = ['lab','imaging','note','medication','symptom','other'];
@@ -572,8 +665,30 @@ function RecordsContent({uploads, setUploads, analyzing, setAnalyzing, filter, s
 }
 
 function ChatContent({msgs, busy, input, setInput, send, QUICK_QS, endRef, isMobile, recording, toggleVoice, voiceHint, lastModel}) {
+  const [votes,      setVotes]      = useState({});   // { msgIndex: 'up'|'down' }
+  const [shareIdx,   setShareIdx]   = useState(null); // index of msg being shared
+  const [copiedIdx,  setCopiedIdx]  = useState(null);
+
+  const vote = (i, dir) => setVotes(v => ({...v, [i]: v[i]===dir ? null : dir}));
+
+  const copyText = async (i, content) => {
+    const plain = content.replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
+    try { await navigator.clipboard.writeText(plain); }
+    catch { /* silent */ }
+    setCopiedIdx(i);
+    setTimeout(() => setCopiedIdx(null), 2000);
+  };
+
+  const userMsgs = msgs?.filter(m=>m.role==='user') || [];
+
   return (
     <>
+      {shareIdx !== null && (
+        <ShareModal
+          content={msgs[shareIdx]?.content || ''}
+          onClose={() => setShareIdx(null)}
+        />
+      )}
       <div className={isMobile?'mob-msgs':'desk-msgs'}>
         {(msgs||[]).map((m,i)=>(
           <div key={i} className={`${isMobile?'msg':'desk-msg'} ${m.role==='user'?'u':'a'} fu`}>
@@ -586,7 +701,34 @@ function ChatContent({msgs, busy, input, setInput, send, QUICK_QS, endRef, isMob
                 <span className="model-badge badge-sonnet"><Zap size={9}/>Sonnet</span>
               )}
             </div>
-            {m.role==='user'?<div className="mb">{m.content}</div>:<div className="mb" dangerouslySetInnerHTML={{__html:renderMd(m.content)}}/>}
+            {m.role==='user'
+              ? <div className="mb">{m.content}</div>
+              : <>
+                  <div className="mb" dangerouslySetInnerHTML={{__html:renderMd(m.content)}}/>
+                  {/* Action bar */}
+                  <div className="action-bar">
+                    <button className={`act-btn ${votes[i]==='up'?'voted':''}`} onClick={()=>vote(i,'up')} title="Helpful">
+                      👍 {votes[i]==='up' ? 'Helpful' : ''}
+                    </button>
+                    <button className={`act-btn ${votes[i]==='down'?'voted':''}`} onClick={()=>vote(i,'down')} title="Not helpful">
+                      👎 {votes[i]==='down' ? 'Not helpful' : ''}
+                    </button>
+                    <div className="act-sep"/>
+                    <button className="act-btn" onClick={()=>copyText(i, m.content)} title="Copy text">
+                      {copiedIdx===i ? '✓ Copied' : '📋 Copy'}
+                    </button>
+                    <button className="act-btn" onClick={()=>setShareIdx(i)} title="Share">
+                      🔗 Share
+                    </button>
+                    <button className="act-btn" onClick={()=>generatePDF(
+                      m.content,
+                      userMsgs[Math.floor(i/2)]?.content || ''
+                    )} title="Download as PDF">
+                      📄 PDF
+                    </button>
+                  </div>
+                </>
+            }
           </div>
         ))}
         {busy&&(
@@ -609,12 +751,7 @@ function ChatContent({msgs, busy, input, setInput, send, QUICK_QS, endRef, isMob
           {voiceHint && <div className="voice-hint">{recording ? '🔴 ' : ''}{voiceHint}</div>}
           {input && recording && <div className="transcript-preview">"{input}"</div>}
           <div className={isMobile?'mob-irow':'desk-irow'}>
-            <button
-              className={`mic-btn ${recording?'recording':''}`}
-              onClick={toggleVoice}
-              title={recording?'Stop recording':'Start voice input'}
-              aria-label={recording?'Stop recording':'Tap to speak'}
-            >
+            <button className={`mic-btn ${recording?'recording':''}`} onClick={toggleVoice} title={recording?'Stop recording':'Start voice input'}>
               {recording ? <MicOff size={17}/> : <Mic size={17}/>}
             </button>
             <textarea className="ci" value={input} onChange={e=>setInput(e.target.value)}
@@ -622,7 +759,7 @@ function ChatContent({msgs, busy, input, setInput, send, QUICK_QS, endRef, isMob
               placeholder="Ask any health question — or tap the mic to speak…" rows={1}/>
             <button className="sb" onClick={()=>send()} disabled={busy||!input.trim()}><Send size={16}/></button>
           </div>
-          <div className="disc">⚕ Educational only — not a substitute for professional medical advice.</div>
+          <div className="disc">⚕ For educational and clinical decision-support purposes only.</div>
           <div style={{textAlign:'center',marginTop:6,fontSize:10,color:'var(--mu)',letterSpacing:'.2px'}}>Powered by <a href="https://www.bioprecisionaging.com" target="_blank" rel="noopener noreferrer" style={{fontWeight:600,color:'var(--g9)',textDecoration:'none'}}>Bio Precision Aging</a></div>
         </div>
       </div>
