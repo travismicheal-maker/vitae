@@ -1,793 +1,859 @@
 // src/peptides.js
-// Bio Precision Aging — Peptide Knowledge Base
-// All 39 peptides. Default route: SQ injection unless noted.
-// Structure ready for detailed dosing/background population.
+// Peptide knowledge base — Vitae Bio Precision Aging
+// BPC-157 fully updated from research literature (May 2026)
+// ─────────────────────────────────────────────────────────────
+
+export const PEPTIDE_GOALS_DATA = [
+  { id: 'recovery',        label: 'Recovery & Healing',         icon: '🔄' },
+  { id: 'sleep',           label: 'Sleep Quality',              icon: '😴' },
+  { id: 'muscle_mass',     label: 'Muscle Mass & Strength',     icon: '💪' },
+  { id: 'weight_loss',     label: 'Weight Reduction',           icon: '⚖️' },
+  { id: 'visceral_fat',    label: 'Visceral Fat Reduction',     icon: '🎯' },
+  { id: 'longevity',       label: 'Longevity & Anti-Aging',     icon: '⏳' },
+  { id: 'mitochondrial',   label: 'Cellular / Mitochondrial',   icon: '⚡' },
+  { id: 'fertility',       label: 'Fertility & Hormonal',       icon: '🧬' },
+  { id: 'fatigue',         label: 'Physical Fatigue',           icon: '🔋' },
+  { id: 'mental_clarity',  label: 'Mental Clarity & Cognition', icon: '🧠' },
+  { id: 'inflammation',    label: 'Inflammation Reduction',     icon: '🛡️' },
+  { id: 'metabolic_health',label: 'Metabolic Health',           icon: '📊' },
+  { id: 'sexual_function', label: 'Sexual Health',              icon: '💚' },
+  { id: 'gut_health',      label: 'Gut & GI Health',            icon: '🌿' },
+  { id: 'neuroprotection', label: 'Neuroprotection',            icon: '🔬' },
+  { id: 'anti_aging',      label: 'Skin & Connective Tissue',   icon: '✨' },
+];
 
 export const PEPTIDE_KNOWLEDGE_BASE = [
 
-  // ── GLP-1 / Metabolic ────────────────────────────────────────────────────────
+  // ─── BPC-157 ────────────────────────────────────────────────────────────────
+  {
+    id: 'bpc157',
+    name: 'BPC-157',
+    fullName: 'Body Protection Compound 157',
+    aliases: ['BPC 157', 'PL-10', 'PLD-116', 'PL14736', 'Bepectin'],
+    category: 'Healing & Cytoprotection',
+    categoryTag: 'healing',
+    goals: ['recovery', 'gut_health', 'inflammation', 'neuroprotection', 'anti_aging'],
+    regulatoryStatus: 'Category 1 (compoundable by prescription) — reclassified Feb 27, 2026 by HHS. FDA safety review concludes July 2026.',
+    researchLevel: 'moderate', // animal + limited human
+    researchSummary: '200+ preclinical publications (1993–2024). Three published human studies as of 2026: IV safety pilot (Lee 2025), interstitial cystitis pilot (Lee 2024), knee pain intra-articular (Lee 2021). Phase I trial (NCT02637284) started 2015 but results were withdrawn in 2016.',
 
+    molecular: {
+      formula: 'C62H98N16O22',
+      molecularWeight: 1419.5355,
+      sequence: 'Gly-Glu-Pro-Pro-Pro-Gly-Lys-Pro-Ala-Asp-Asp-Ala-Gly-Leu-Val',
+      sequenceAbbrev: 'GEPPPGKPADDAGLV',
+      source: 'Partial sequence of Body Protection Compound (BPC) isolated from human gastric juice (Sikiric et al., 1993)',
+      stability: 'Stable in water, saline, and human gastric juice for >24 h. Resistant to hydrolysis and enzyme digestion. Can be stored at room temperature lyophilized; stable refrigerated 30 days post-reconstitution.',
+    },
+
+    summary: 'BPC-157 is a synthetic 15-amino-acid pentadecapeptide isolated from human gastric juice. It is the most extensively studied healing peptide in preclinical literature with over 200 published studies covering tendon, ligament, muscle, bone, GI tract, brain, and vascular healing models. It carries the most robust animal-model healing literature of any peptide currently in clinical use.',
+
+    mechanism: `BPC-157 operates through several overlapping pathways:
+
+• VEGFR2 Upregulation — Primary angiogenic mechanism. Stimulates vascular endothelial growth factor receptor-2 expression in ischemic tissue and endothelial cultures, driving new capillary formation (angiogenesis and vasculogenesis). This is why subcutaneous injection in the abdomen can affect a distant tendon.
+
+• Nitric Oxide (NO) / eNOS Modulation — Interacts with the NO synthase system bidirectionally. Counteracts L-NAME (NOS inhibitor) damage and modulates L-arginine effects. Critical for vascular tone, mucosal integrity, and wound healing without depending on endogenous NO levels to work.
+
+• FAK-Paxillin Pathway — Activates focal adhesion kinase signaling, promoting cell survival, migration, and outgrowth — key for tendon healing (tendon outgrowth) and wound closure.
+
+• Growth Hormone Receptor (GHR) Upregulation — BPC-157 dose- and time-dependently increases GHR expression in tendon fibroblasts at mRNA and protein level (up to 7-fold by day 3). Combined with endogenous GH, this activates JAK2-STAT signaling → cell proliferation and PCNA expression. This explains synergy with GH-axis peptides (CJC/ipamorelin stacks).
+
+• EGR-1 / NAB2 Expression — Stimulates early growth response-1 gene (cytokine/growth factor generation, early collagen formation) and its repressor nab2. Promotes collagen organization and granulation tissue earlier than PDGF-BB.
+
+• Dopamine, Serotonin & Prostaglandin Modulation — Interacts with dopaminergic (attenuates haloperidol catalepsy, amphetamine effects) and serotonergic systems (5-HT2A-specific counteraction of serotonin syndrome). Anti-prostaglandin effects contribute to anti-inflammatory and gastroprotective activity.
+
+• Antioxidant Enzyme Upregulation — Increases HO-1, NQO-1, glutathione reductase, glutathione peroxidase 2, GST-pi. Stabilizes free radical scavengers.`,
+
+    benefits: [
+      'Accelerates tendon-to-bone healing and ligament repair (Achilles, quadriceps, rotator cuff models)',
+      'Heals GI tract: peptic ulcers, IBD, colocutaneous fistulas, NSAID-induced damage, esophageal lesions',
+      'Repairs burn wounds topically — outperforms silver sulfadiazine in multiple parameters including re-epithelialization, collagen formation, angiogenesis',
+      'Stimulates angiogenesis — optimizes vascular response across endothelial damage, clotting, thrombosis, vasoconstriction/dilation, and edema',
+      'Neuroprotection — improves TBI outcomes, sciatic nerve healing, spinal cord injury recovery in rats',
+      'Reduces systemic inflammation (lowers IL-6, TNF-α, LTB4, TXB2, MPO)',
+      'Antidepressant and anxiolytic properties measured in Porsolt test',
+      'Cytoprotective: shields against NSAID toxicity, corticosteroid impairment, alcohol liver damage',
+      'Gastroprotective: stable in gastric juice, acts as basal protectant in saliva and gastric mucosa',
+      'Potential in interstitial cystitis (IC): 10/12 patients with moderate-severe IC had 100% symptom resolution in single-procedure pilot (Lee 2024)',
+      'Joint pain: 11/12 knee pain patients reported significant relief after single intra-articular injection (Lee 2021)',
+    ],
+
+    pharmacokinetics: {
+      halfLife: '<30 minutes (prototype peptide) — consistent across rats and dogs',
+      tmax: '3 min (rats IM), 6–9 min (dogs IM)',
+      bioavailabilityIM: '14–19% (rats), 45–51% (dogs)',
+      distributionPeak: 'Highest tissue concentrations: kidney > liver > stomach wall > thymus > spleen. Intestine/lung/skin ~ plasma. Low in brain (poor BBB penetration) and fat.',
+      metabolism: 'Rapidly degraded by endopeptidases → 6 identified peptide metabolite fragments (M1–M6) → proline (main metabolite, 86% of plasma radioactivity at 1h) → normal amino acid metabolic pathway',
+      excretion: 'Primary: urinary (15.9% in 72h). Secondary: biliary (9.1% in 72h bile-duct cannulated rats). Remainder in cadaver tissue as metabolites.',
+      linearPK: 'Yes — AUC and Cmax linear across all tested doses in rats and dogs',
+      accumulation: 'No accumulation with 7-day repeated dosing (parameters match single-dose)',
+      humanPK: 'Human PK formally unstudied (Veljaca 2002 abstract — details unavailable). IV pilot (Lee 2025): no biomarker changes at 10–20 mg doses suggesting safe clearance.',
+    },
+
+    humanEvidence: [
+      {
+        study: 'Lee & Burgess (2025) — Alt Ther Health Med 31(5)',
+        type: 'IRB-approved safety pilot',
+        n: 2,
+        finding: 'IV infusion of 10 mg then 20 mg BPC-157 in 250cc normal saline over 1 hour on consecutive days. No clinically significant changes in CBC, CMP, CPK, BNP, CRP, TSH, or RBC magnesium. No side effects reported. First published IV human safety data.',
+      },
+      {
+        study: 'Lee, Walker & Ayadi (2024) — Alt Ther Health Med (PMID: 39325560)',
+        type: 'Pilot study — interstitial cystitis',
+        n: 12,
+        finding: '10 mg intravesical injection. 10/12 patients: 100% symptom resolution. 2/12: 80% improvement. No adverse events. Single-procedure treatment in patients who failed pentosan polysulfate.',
+      },
+      {
+        study: 'Lee & Padgett (2021) — Alt Ther Health Med 27(4)',
+        type: 'Retrospective — knee pain',
+        n: 16,
+        finding: 'Intra-articular injection. 14/16 patients reported knee pain relief. Well tolerated, no side effects.',
+      },
+      {
+        study: 'Ruenzi et al. (2005) — Gastroenterology 128 A584 (Phase II UC trial)',
+        type: 'RCT — ulcerative colitis',
+        n: 46,
+        finding: 'PL14736 enema 80 mg/day x 2 weeks. DAI reduced 3.2 points vs 1.6 placebo. Trend but not statistically significant vs placebo. Well-tolerated.',
+      },
+      {
+        study: 'Vasireddi et al. (2025) — Systematic Review (PMID: 40756949)',
+        type: 'Systematic review',
+        n: '36 studies (35 preclinical, 1 clinical)',
+        finding: 'BPC-157 enhances GHR expression, angiogenesis pathways, reduces inflammatory cytokines. Improved functional, structural, and biomechanical outcomes across MSK injuries. Metabolized in liver, t1/2 <30 min. No adverse effects in preclinical safety. No clinical safety data found.',
+      },
+    ],
+
+    dosing: {
+      clinicalPharmacy: {
+        typical: '250–500 mcg once daily',
+        range: '250–500 mcg/day',
+        route: 'Subcutaneous injection (only route dispensed by 503A compounding pharmacies in 2026)',
+        sites: 'Abdomen and thigh rotation; peri-lesional when feasible for targeted MSK',
+        reconstitution: '5 mg vial + 2 mL BAC water = 2.5 mg/mL (draw 0.10 mL = 250 mcg; 0.20 mL = 500 mcg)',
+        cycle: '4–6 weeks standard; 6–8 weeks chronic tendinopathy',
+        storage: 'Lyophilized: room temp or refrigerated. Reconstituted: 2–8°C, stable ~30 days. Do not freeze reconstituted vials.',
+      },
+      communityReported: {
+        standard: '250 mcg twice daily (500 mcg/day total) SC',
+        acuteInjury: '500 mcg twice daily (1,000 mcg/day) x 2 weeks, then taper to 250 mcg BID',
+        maintenance: '250 mcg once daily, 5 days on / 2 days off',
+        oral: '500–1,000 mcg/day sublingual or liquid, once or twice daily fasted — use case limited to GI/IBD indications',
+        gut: '250–500 mcg twice daily oral or SC for 6–8 weeks',
+      },
+      goalBasedDosing: {
+        'Acute musculoskeletal injury': '500 mcg BID SC, 4–6 weeks',
+        'Chronic tendinopathy': '250 mcg BID SC, 6–8 weeks',
+        'Gut / GI healing (IBD, gastritis, leaky gut)': '250–500 mcg BID oral or SC, 6–8 weeks',
+        'Post-surgical recovery': '500 mcg BID SC, 4 weeks',
+        'General repair / longevity': '250 mcg once daily SC, 4 weeks on / 4 weeks off',
+        'Interstitial cystitis': '10 mg intravesical injection (clinical procedure only)',
+      },
+      cycleLengths: {
+        mostCommon: '4 weeks on / 2–4 weeks off',
+        aggressiveInjury: '6–8 weeks continuous, then 4 weeks off',
+        longTermContinuous: 'Not studied; precautionary break every 8 weeks recommended',
+      },
+      ivDosing: {
+        humanData: '10–20 mg in 250 cc NS over 1 hour (Lee 2025 pilot). Used anecdotally at 5 mg in clinical settings since 2018.',
+        note: 'IV is off-label and not dispensed by compounding pharmacies in standard protocols. Requires physician supervision.',
+      },
+    },
+
+    stacksAndCombinations: [
+      {
+        stack: 'Wolverine Stack (BPC-157 + TB-500)',
+        use: 'Dominant healing combination. Synergistic — BPC provides angiogenesis/collagen/GHR upregulation; TB-500 provides actin sequestration and systemic anti-inflammatory + cell migration.',
+        note: 'Most commonly used for MSK injuries, post-surgical recovery',
+      },
+      {
+        stack: 'BPC-157 + GHK-Cu',
+        use: 'Wound and skin healing, tissue regeneration',
+      },
+      {
+        stack: 'BPC-157 + KPV',
+        use: 'Gut-focused stack for IBD, leaky gut',
+      },
+      {
+        stack: 'BPC-157 + IGF-1 LR3',
+        use: 'Off-label injury recovery, used in bodybuilding contexts',
+      },
+      {
+        stack: 'BPC-157 + CJC-1295 / Ipamorelin',
+        use: 'Recovery + GH axis stack. BPC-157 upregulates GHR, amplifying GH released by CJC/ipamorelin. Very common combination.',
+      },
+      {
+        stack: 'BPC-157 + Semaglutide (Sublingual)',
+        use: 'Patented combination (US 2023/11833189 — Bentz et al.). Proposed synergistic weight-loss and GI side-effect mitigation.',
+      },
+    ],
+
+    sideEffects: {
+      reported: [
+        'Injection site irritation, redness, mild bruising (most common — rotate sites)',
+        'Transient fatigue or brain fog in first 1–2 days (~10% in community surveys, resolves 3–7 days)',
+        'Mild flushing or warmth shortly after injection',
+        'Rare: dizziness, headache',
+        'Pain or necrosis possible if injected in aqueous solution (use BAC water properly)',
+      ],
+      noSerious: 'No serious adverse events reported in published animal literature or community surveys (500,000+ prescriptions dispensed 2018–2024 with no adverse events reported to 503A pharmacies)',
+      theoreticalConcerns: [
+        'Angiogenic activity (VEGFR2) may support occult tumor vasculature — no published human evidence either way; flagged as theoretical concern in Józwiak 2025 review',
+        'Excess NO stimulation at high doses: potential mitochondrial respiration inhibition, peroxynitrite formation (theoretical, not observed)',
+        'Proline metabolite → proline oxidase → superoxide cascade (theoretical metabolic concern in Józwiak 2025)',
+        'WADA: temporarily banned 2022, currently NOT on 2026 prohibited list — verify sport-specific rules',
+      ],
+      lethalDose: 'LD1 not achieved in rodent studies. Single dose 20 mg/kg IM in rats — no deaths or adverse effects. 10 mg/kg IM in dogs — no adverse effects.',
+    },
+
+    contraindications: [
+      'Active malignancy (theoretical angiogenic concern)',
+      'Known hypersensitivity to peptide components',
+      'Pregnancy (insufficient data)',
+      'Use with caution in patients with cardiovascular disease or significant CV risk factors (NO pathway interactions)',
+    ],
+
+    patentApplications: [
+      'US 1998/052973 — BPC peptide salts with organo-protective activity (Sikiric et al.)',
+      'US 2023/11833189 — Sublingual semaglutide-BPC 157 combination for weight loss (Bentz et al.)',
+      'US 2023/0141224 — BPC 157 + fibroblast therapy for ARDS (Ichim, O\'Heeron)',
+      'WO 2021/202031 — BPC 157 + peptides for coronavirus fibroblast therapy',
+      'Croatia Patent 2013/1075 — BPC 157 for multiple sclerosis treatment',
+      'US 2022/0249575 — BPC 157 formulation for ophthalmic disorders (Vitti)',
+      'WO 2021/252292 — BPC 157 for persistent neurogenic pain and complex injury',
+      'EP 2022/4226918 — Oral capsule-in-capsule delivery system for BPC 157',
+      'CN 2024/118615479 — BPC 157 medical dressing for scar repair',
+    ],
+
+    keyReferences: [
+      'Sikiric P et al. (1993). A new gastric juice peptide, BPC. J Physiol Paris 87(5):313-327.',
+      'Klicek R et al. (2008). BPC 157 heals colocutaneous fistulas in rats: Role of the NO system. J Pharmacol Sci 108:7-17.',
+      'He L et al. (2022). Pharmacokinetics, distribution, metabolism, and excretion of BPC 157 in rats and dogs. Front Pharmacol 13:1026182.',
+      'Chang CH et al. (2014). BPC 157 enhances growth hormone receptor expression in tendon fibroblasts. Molecules 19:19066-19077.',
+      'Lee E & Burgess K (2025). Safety of IV infusion of BPC-157 in humans: a pilot study. Alt Ther Health Med 31(5):20-24.',
+      'Lee E et al. (2024). Effect of BPC-157 on symptoms in patients with interstitial cystitis. PMID: 39325560.',
+      'Mikus D et al. (2001). BPC 157 cream improves burn-wound healing and attenuates burn-gastric lesions in mice. Burns 27:817-827.',
+      'Seiwerth S et al. (2014). BPC 157 and blood vessels. Curr Pharm Des 20(7):1121-1125. PMID: 23782145.',
+      'Józwiak M et al. (2025). Multifunctionality and possible medical application of the BPC 157 peptide. Pharmaceuticals 18:185.',
+      'Vasireddi N et al. (2025). Emerging use of BPC-157 in orthopaedic sports medicine: systematic review. PMID: 40756949.',
+      'Ruenzi M et al. (2005). Phase II RCT of PL 14736 enema in ulcerative colitis. Gastroenterology 128:A584.',
+    ],
+  },
+
+  // ─── TB-500 ─────────────────────────────────────────────────────────────────
+  {
+    id: 'tb500',
+    name: 'TB-500',
+    fullName: 'Thymosin Beta-4 (synthetic fragment)',
+    aliases: ['Thymosin Beta-4', 'Tβ4'],
+    category: 'Healing & Recovery',
+    categoryTag: 'healing',
+    goals: ['recovery', 'inflammation', 'muscle_mass', 'anti_aging'],
+    regulatoryStatus: 'Not FDA-approved. Available via research peptide vendors; compounding pharmacy access limited.',
+    researchLevel: 'moderate',
+    summary: 'Synthetic version of the naturally occurring Thymosin Beta-4 protein fragment. Potent tissue repair, anti-inflammatory, and cell migration agent. Frequently paired with BPC-157 in the "Wolverine Stack."',
+    mechanism: 'Sequesters G-actin monomers (actin polymerization regulation), promotes cell migration and proliferation, upregulates matrix metalloproteinases, stimulates formation of new blood vessels, reduces inflammation via NF-κB pathway modulation.',
+    benefits: [
+      'Accelerated healing of muscle, tendon, and ligament injuries',
+      'Systemic anti-inflammatory effects',
+      'Promotes cardiac repair post-myocardial injury',
+      'Neurological — promotes neurite outgrowth',
+      'Hair follicle stimulation (some evidence)',
+    ],
+    dosing: {
+      typical: '2–2.5 mg twice weekly (loading), 2 mg weekly (maintenance)',
+      range: '1–5 mg per dose',
+      route: ['subcutaneous injection', 'intramuscular injection'],
+      cycle: '4–6 weeks loading, then maintenance or cycle break',
+      notes: 'Often stacked with BPC-157. Not orally bioavailable.',
+    },
+    sideEffects: 'Generally well-tolerated. Mild fatigue reported anecdotally. Limited long-term human data.',
+    keyReferences: ['Goldstein AL et al. (2012). Thymosin beta4: a multi-functional regenerative peptide. Expert Opin Biol Ther.'],
+  },
+
+  // ─── ARA-290 ─────────────────────────────────────────────────────────────────
+  {
+    id: 'ara290',
+    name: 'ARA-290',
+    fullName: 'ARA-290 (Cibinetide)',
+    aliases: ['Cibinetide', 'ARA290'],
+    category: 'Neuroprotection & Metabolic',
+    categoryTag: 'neuroprotection',
+    goals: ['neuroprotection', 'inflammation', 'metabolic_health', 'fatigue'],
+    regulatoryStatus: 'Investigational. Clinical trials completed in sarcoidosis/small fiber neuropathy. Not FDA-approved.',
+    researchLevel: 'high',
+    summary: 'A non-hematopoietic EPO analogue that selectively activates the tissue-protective receptor (βcR) without stimulating red blood cell production. Primarily studied for neuropathic pain, small fiber neuropathy, and metabolic dysfunction.',
+    mechanism: 'Binds tissue-protective receptor complex (EPOR/βcR heterodimer) independently of the hematopoietic receptor. Activates Akt/PI3K, JAK2, and STAT3 pathways promoting cell survival and anti-apoptotic signaling. Reduces systemic inflammation via NF-κB and TNF-α suppression.',
+    benefits: [
+      'Significant reduction in neuropathic pain (sarcoidosis patients — RCT data)',
+      'Regeneration of small nerve fibers',
+      'Improved corneal nerve fiber density',
+      'Improved insulin sensitivity and metabolic parameters',
+      'Anti-inflammatory: reduces TNF-α, IL-6',
+      'Protective against ischemia-reperfusion injury',
+    ],
+    dosing: {
+      typical: '4 mg once daily SC (clinical trial doses)',
+      range: '1–8 mg/day',
+      route: ['subcutaneous injection'],
+      cycle: '4–12 weeks depending on indication',
+      notes: 'Dosed based on clinical trial protocols. No established community dosing range.',
+    },
+    sideEffects: 'Well-tolerated in clinical trials. Mild injection site reactions. No erythropoietic effects (no RBC stimulation).',
+    keyReferences: ['Brines M et al. (2014). ARA290 alleviates chronic neuropathic pain in sarcoidosis patients. Mol Med.'],
+  },
+
+  // ─── AOD-9604 ─────────────────────────────────────────────────────────────────
+  {
+    id: 'aod9604',
+    name: 'AOD-9604',
+    fullName: 'Advanced Obesity Drug 9604',
+    aliases: ['AOD 9604', 'hGH Fragment 176-191'],
+    category: 'Metabolic & Fat Loss',
+    categoryTag: 'metabolic',
+    goals: ['weight_loss', 'visceral_fat', 'metabolic_health', 'recovery'],
+    regulatoryStatus: 'GRAS status (Generally Recognized as Safe) granted by FDA for food use. Not approved as a drug. Compoundable.',
+    researchLevel: 'moderate',
+    summary: 'C-terminal fragment of human growth hormone (residues 176–191). Retains hGH\'s lipolytic properties without the IGF-1 stimulating or diabetogenic effects. Also demonstrated cartilage and bone repair properties.',
+    mechanism: 'Stimulates lipolysis (fat breakdown) and inhibits lipogenesis through β-adrenergic receptor pathways, independent of IGF-1. Does not affect blood glucose or insulin resistance. In cartilage: promotes proteoglycan synthesis and chondrocyte differentiation.',
+    benefits: [
+      'Visceral and subcutaneous fat reduction',
+      'No effect on blood glucose or insulin sensitivity',
+      'Cartilage regeneration — proteoglycan synthesis in OA models',
+      'Potential for osteoarthritis and joint repair',
+      'Beneficial lipid profile effects',
+    ],
+    dosing: {
+      typical: '300–500 mcg once daily',
+      range: '150–600 mcg/day',
+      route: ['subcutaneous injection', 'oral (limited bioavailability)'],
+      cycle: '8–12 weeks, assess results',
+      notes: 'Inject on empty stomach, ideally morning or pre-exercise. Intra-articular use: 0.25 mg AOD + 6 mg HA weekly x 4–7 weeks under ultrasound guidance.',
+    },
+    sideEffects: 'Exceptionally well-tolerated. No growth or IGF-1 effects. Minimal injection site reactions.',
+    keyReferences: ['Ng FM et al. (2000). AOD9604: An anti-obesity drug targeting fat breakdown. Biochemistry.'],
+  },
+
+  // ─── Semaglutide ──────────────────────────────────────────────────────────────
   {
     id: 'semaglutide',
     name: 'Semaglutide',
-    fullName: 'Semaglutide (GLP-1 receptor agonist)',
-    category: 'metabolic',
-    route: ['subcutaneous injection'],
-    goals: ['weight_loss', 'visceral_fat', 'metabolic_health', 'longevity'],
-    summary: 'GLP-1 receptor agonist. FDA approved for T2DM (Ozempic) and obesity (Wegovy). First-line peptide for significant weight and visceral fat reduction.',
-    mechanism: 'Activates GLP-1 receptors in the pancreas (insulin secretion), hypothalamus (appetite suppression), and GI tract (delayed gastric emptying). Reduces glucagon, lowers postprandial glucose.',
-    benefits: ['15–20% body weight reduction (STEP trials)', 'Significant visceral fat reduction', 'Cardiovascular risk reduction (SUSTAIN-6)', 'Improved insulin sensitivity', 'Emerging neuroprotective and longevity data'],
-    dosing: { typical: '0.25–2.4 mg/week', range: 'Titrate: 0.25 → 0.5 → 1 → 1.7 → 2.4 mg over 16–20 weeks', frequency: 'Once weekly', route: ['subcutaneous injection'], cycle: 'Chronic therapy', notes: 'Slow titration minimizes nausea. Compounded semaglutide: verify semaglutide base only, no acetate salt.' },
-    sideEffects: 'Nausea (most common, dose-dependent), vomiting, constipation, GERD. Rare: pancreatitis. Contraindicated in MEN2/medullary thyroid carcinoma history.',
+    fullName: 'Semaglutide (GLP-1 Receptor Agonist)',
+    aliases: ['Ozempic', 'Wegovy', 'Rybelsus'],
+    category: 'GLP-1 / Metabolic',
+    categoryTag: 'metabolic',
+    goals: ['weight_loss', 'visceral_fat', 'metabolic_health'],
+    regulatoryStatus: 'FDA-approved (Ozempic: T2DM; Wegovy: obesity; Rybelsus: oral T2DM). Available via compounding pharmacies during shortage periods.',
     researchLevel: 'very_high',
-    tags: ['FDA approved', 'GLP-1', 'weekly injection'],
+    summary: 'Long-acting GLP-1 receptor agonist. Gold standard for weight management and T2DM. 15–20% body weight reduction in clinical trials. Weekly subcutaneous injection or daily oral tablet.',
+    mechanism: 'Binds and activates GLP-1 receptors in pancreas (insulin secretion, glucagon suppression), brain (appetite suppression, satiety), GI tract (delayed gastric emptying), and cardiovascular system (cardioprotective).',
+    benefits: [
+      '15–20% body weight reduction (SUSTAIN, STEP trials)',
+      'Significant HbA1c reduction in T2DM',
+      'Cardiovascular risk reduction (SUSTAIN-6)',
+      'MASH/NASH improvement',
+      'Potential neuroprotective effects (under investigation)',
+    ],
+    dosing: {
+      typical: '0.5–2.4 mg/week SC (Wegovy dosing); 0.5–1 mg/week (Ozempic)',
+      range: '0.25 mg/week starting dose, titrate over 16–20 weeks',
+      route: ['subcutaneous injection', 'oral tablet (Rybelsus)'],
+      cycle: 'Ongoing — chronic therapy for T2DM/obesity',
+      notes: 'Titrate slowly to minimize GI side effects. Pause before surgery if gastroparesis concern. Patent combination with BPC-157 for weight loss exists (Bentz 2023).',
+    },
+    sideEffects: 'Nausea, vomiting, diarrhea (especially during titration). Rare: pancreatitis, gallbladder disease, thyroid C-cell risk (animal data). Muscle mass loss concern with rapid weight loss.',
+    keyReferences: ['Wilding JPH et al. (2021). STEP-1: Semaglutide in obesity. NEJM.'],
   },
 
+  // ─── Tirzepatide ──────────────────────────────────────────────────────────────
   {
     id: 'tirzepatide',
     name: 'Tirzepatide',
-    fullName: 'Tirzepatide (GIP/GLP-1 dual agonist)',
-    category: 'metabolic',
-    route: ['subcutaneous injection'],
-    goals: ['weight_loss', 'visceral_fat', 'metabolic_health', 'muscle_preservation'],
-    summary: 'Dual GIP and GLP-1 receptor agonist. FDA approved (Mounjaro/Zepbound). Superior weight loss efficacy vs semaglutide. GIP component may preserve lean mass.',
-    mechanism: 'Simultaneous activation of GIP and GLP-1 receptors produces additive metabolic effects. GIP also acts on adipocytes and may improve lean mass preservation.',
-    benefits: ['20–22.5% body weight reduction (SURMOUNT-1)', 'Superior to semaglutide head-to-head', 'Better lean mass preservation', 'Strong visceral fat reduction', 'Excellent glycemic control'],
-    dosing: { typical: '5–15 mg/week', range: 'Titrate: 2.5 → 5 → 7.5 → 10 → 12.5 → 15 mg over 20+ weeks', frequency: 'Once weekly', route: ['subcutaneous injection'], cycle: 'Chronic therapy', notes: 'Slower titration vs semaglutide. SURMOUNT trials showed best-in-class weight outcomes.' },
-    sideEffects: 'Similar to semaglutide — nausea, GI upset. Some evidence of better GI tolerability than semaglutide. Same thyroid/pancreas precautions.',
+    fullName: 'Tirzepatide (GIP/GLP-1 Dual Agonist)',
+    aliases: ['Mounjaro', 'Zepbound'],
+    category: 'GLP-1 / Metabolic',
+    categoryTag: 'metabolic',
+    goals: ['weight_loss', 'visceral_fat', 'metabolic_health'],
+    regulatoryStatus: 'FDA-approved (Mounjaro: T2DM; Zepbound: obesity).',
     researchLevel: 'very_high',
-    tags: ['FDA approved', 'GLP-1/GIP', 'weekly injection'],
+    summary: 'First-in-class dual GIP and GLP-1 receptor co-agonist. Superior weight loss vs semaglutide (20–22% body weight). Weekly SC injection.',
+    mechanism: 'Activates both GIP and GLP-1 receptors. GIP adds insulin-potentiating and adipose-tissue-direct lipid-lowering effects beyond GLP-1 alone.',
+    benefits: [
+      '20–22% body weight reduction (SURMOUNT trials)',
+      'Superior glycemic control vs semaglutide',
+      'Improved lipid profile',
+      'Sleep apnea improvement (SURMOUNT-OSA)',
+      'Heart failure benefit (SUMMIT trial)',
+    ],
+    dosing: {
+      typical: '5–15 mg/week SC',
+      range: '2.5 mg starting, titrate by 2.5 mg every 4 weeks to maintenance dose',
+      route: ['subcutaneous injection'],
+      cycle: 'Ongoing chronic therapy',
+      notes: 'Slower titration than semaglutide reduces GI side effects. Pair with resistance training and adequate protein to preserve muscle mass.',
+    },
+    sideEffects: 'Similar to semaglutide: nausea, diarrhea, vomiting during titration. Possibly less nausea than semaglutide at equivalent weight loss.',
+    keyReferences: ['Jastreboff AM et al. (2022). SURMOUNT-1: Tirzepatide in obesity. NEJM.'],
   },
 
+  // ─── CJC-1295 ─────────────────────────────────────────────────────────────────
   {
-    id: 'retatrutide',
-    name: 'Retatrutide',
-    fullName: 'Retatrutide (GLP-1/GIP/Glucagon triple agonist)',
-    category: 'metabolic',
-    route: ['subcutaneous injection'],
-    goals: ['weight_loss', 'visceral_fat', 'metabolic_health', 'muscle_preservation'],
-    summary: 'Triple incretin agonist (GLP-1 + GIP + glucagon receptors). Phase 2 data shows superior weight loss vs tirzepatide (~24% body weight). Not yet FDA approved.',
-    mechanism: 'Adds glucagon receptor agonism to dual GLP-1/GIP action — increases energy expenditure and hepatic fat mobilization while preserving benefits of dual incretins.',
-    benefits: ['~24% body weight reduction in Phase 2 trials', 'Most powerful weight loss peptide in development', 'Enhanced fat oxidation via glucagon component', 'Strong hepatic fat reduction'],
-    dosing: { typical: '4–12 mg/week (investigational)', range: 'Titrate slowly — Phase 2 protocol: 2 → 4 → 8 → 12 mg', frequency: 'Once weekly', route: ['subcutaneous injection'], cycle: 'Compounded/research use — not FDA approved', notes: 'Compounded versions available. Follow titration carefully — glucagon component adds cardiovascular considerations.' },
-    sideEffects: 'GI effects similar to or greater than tirzepatide. Potential for greater nausea. Glucagon component may affect glucose dynamics.',
-    researchLevel: 'high',
-    tags: ['Phase 2/3', 'triple agonist', 'not FDA approved'],
-  },
-
-  // ── BPC-157 Variants ─────────────────────────────────────────────────────────
-
-  {
-    id: 'bpc157_capsule',
-    name: 'BPC-157 (Capsule)',
-    fullName: 'Body Protection Compound 157 — Oral Capsule',
-    category: 'healing',
-    route: ['oral'],
-    goals: ['gut_health', 'inflammation', 'recovery'],
-    summary: 'Oral BPC-157 for GI-specific indications. Lower systemic bioavailability vs injection but direct gut mucosal action. Preferred route for IBD, leaky gut, GERD, and GI healing.',
-    mechanism: 'Local action on GI mucosal cells. Upregulates growth hormone receptors, promotes local angiogenesis, modulates nitric oxide synthesis in the gut wall.',
-    benefits: ['Direct mucosal healing for IBD, Crohn\'s, GERD', 'Leaky gut repair', 'Gastroprotective', 'Liver and intestinal cytoprotection', 'Systemic absorption still provides some whole-body benefits'],
-    dosing: { typical: '250–500 mcg twice daily', range: '250–1000 mcg/day divided', frequency: 'Twice daily, away from food', route: ['oral capsule'], cycle: '4–12 weeks, can be chronic for GI conditions', notes: 'Take on empty stomach. For systemic effects, injectable form preferred. Capsule is the preferred route for GI pathology.' },
-    sideEffects: 'Generally well-tolerated. Mild nausea possible.',
+    id: 'cjc1295',
+    name: 'CJC-1295',
+    fullName: 'CJC-1295 (GHRH Analogue)',
+    aliases: ['CJC-1295 w/ DAC', 'CJC-1295 no DAC', 'Mod GRF 1-29'],
+    category: 'GH Axis',
+    categoryTag: 'gh_axis',
+    goals: ['muscle_mass', 'recovery', 'sleep', 'anti_aging', 'fatigue'],
+    regulatoryStatus: 'Not FDA-approved. Compoundable by prescription.',
     researchLevel: 'moderate',
-    tags: ['oral', 'GI health', 'capsule'],
+    summary: 'Growth hormone releasing hormone (GHRH) analogue that stimulates pituitary GH release. With DAC (Drug Affinity Complex): weekly dosing, sustained GH elevation. Without DAC (Mod GRF 1-29): pulsatile release, dosed with ipamorelin.',
+    mechanism: 'Binds GHRH receptors on somatotrophs in the pituitary gland, stimulating GH synthesis and release. DAC version covalently binds to albumin, extending half-life to ~8 days.',
+    benefits: [
+      'Increased GH and IGF-1 levels',
+      'Improved body composition (muscle gain, fat loss)',
+      'Enhanced recovery and sleep quality',
+      'Anti-aging effects on skin, hair, energy',
+      'Improved bone density (long-term)',
+    ],
+    dosing: {
+      typical: 'With DAC: 2 mg/week SC. Without DAC: 100–300 mcg with each ipamorelin dose',
+      range: '1–2 mg/week (DAC); 100–300 mcg per pulse (no DAC)',
+      route: ['subcutaneous injection'],
+      cycle: '3–6 months, with breaks to preserve pituitary sensitivity',
+      notes: 'Dose at night on empty stomach for optimal GH pulse alignment. Most often stacked with ipamorelin.',
+    },
+    sideEffects: 'Water retention, joint aches, tingling (GH-related). Injection site reactions. Potential desensitization with DAC form over time.',
+    keyReferences: ['Teichman SL et al. (2006). CJC-1295 sustained GH elevation. JCEM.'],
   },
 
+  // ─── Ipamorelin ───────────────────────────────────────────────────────────────
   {
-    id: 'bpc157_cream',
-    name: 'BPC-157 (Cream)',
-    fullName: 'Body Protection Compound 157 — Topical Cream',
-    category: 'healing',
-    route: ['topical'],
-    goals: ['recovery', 'inflammation', 'anti_aging'],
-    summary: 'Topical BPC-157 for localized tissue healing, wound care, and skin repair. Applied directly to injury sites, surgical wounds, or areas of chronic inflammation.',
-    mechanism: 'Transcutaneous absorption promotes local angiogenesis, fibroblast activation, and collagen deposition. Modulates local inflammatory cytokines.',
-    benefits: ['Accelerated wound and incision healing', 'Localized tendon/ligament support', 'Skin regeneration and scar reduction', 'Arthritis and joint pain applied topically'],
-    dosing: { typical: 'Apply thin layer to affected area 2–3x daily', range: 'Apply as directed by compounding pharmacy concentration', frequency: '2–3x daily', route: ['topical cream'], cycle: 'Continue until healed, typically 2–8 weeks', notes: 'Synergistic with injectable BPC-157. Apply to clean, dry skin. Concentrations vary by compounding pharmacy.' },
-    sideEffects: 'Local skin irritation possible. Generally well-tolerated.',
-    researchLevel: 'low_emerging',
-    tags: ['topical', 'cream', 'localized healing'],
-  },
-
-  {
-    id: 'bpc157_injection',
-    name: 'BPC-157 (Injection)',
-    fullName: 'Body Protection Compound 157 — Subcutaneous/IM Injection',
-    category: 'healing',
-    route: ['subcutaneous injection', 'intramuscular injection'],
-    goals: ['recovery', 'inflammation', 'gut_health', 'injury', 'neuroprotection'],
-    summary: 'Systemic BPC-157 via injection. Best systemic bioavailability. Gold standard for whole-body healing, tendon/ligament repair, and neuroprotection.',
-    mechanism: 'Systemic: upregulates GH receptors, promotes angiogenesis via VEGF, modulates NO system, activates FAK-paxillin wound healing pathway. Crosses blood-brain barrier.',
-    benefits: ['Fastest healing of tendons, ligaments, muscle tears', 'Systemic anti-inflammatory', 'Neuroprotective and potentially neurorestorative', 'GI cytoprotection at systemic level', 'Liver protection'],
-    dosing: { typical: '200–500 mcg/day', range: '100–600 mcg/day', frequency: 'Once or twice daily', route: ['subcutaneous injection', 'intramuscular near injury site'], cycle: '4–12 weeks', notes: 'Inject near site of injury for local effect. Split into two doses (AM/PM) for greater coverage. Stable in bacteriostatic water.' },
-    sideEffects: 'Well-tolerated. Mild nausea at higher doses. No known serious adverse effects in research to date.',
+    id: 'ipamorelin',
+    name: 'Ipamorelin',
+    fullName: 'Ipamorelin (GHRP-5)',
+    aliases: ['GHRP-5'],
+    category: 'GH Axis',
+    categoryTag: 'gh_axis',
+    goals: ['muscle_mass', 'recovery', 'sleep', 'anti_aging', 'fatigue'],
+    regulatoryStatus: 'Not FDA-approved. Compoundable by prescription.',
     researchLevel: 'moderate',
-    tags: ['injection', 'systemic healing', 'workhorse peptide'],
+    summary: 'Selective growth hormone secretagogue (GHSR agonist). Most selective GHRP — does not significantly stimulate cortisol or prolactin release. Always paired with CJC-1295 for synergistic GH pulse.',
+    mechanism: 'Binds ghrelin receptor (GHSR) on pituitary, amplifying GH release. Highly selective — minimal cortisol, prolactin, or ACTH stimulation compared to older GHRPs.',
+    benefits: [
+      'Clean GH pulse without cortisol spike',
+      'Improved sleep quality (slow-wave sleep)',
+      'Muscle gain and fat loss (indirect via GH/IGF-1)',
+      'Enhanced recovery',
+      'Appetite stimulation (mild)',
+    ],
+    dosing: {
+      typical: '100–300 mcg, 1–3x daily',
+      range: '100–300 mcg per dose',
+      route: ['subcutaneous injection'],
+      cycle: '3–6 months, commonly ongoing',
+      notes: 'Bedtime dose most valuable for GH pulse during sleep. Stack with CJC-1295 (no DAC) for 2–10x greater GH output.',
+    },
+    sideEffects: 'Mild transient flushing, tingling, mild water retention. No significant cortisol elevation.',
+    keyReferences: ['Raun K et al. (1998). Ipamorelin selectivity in GH secretion. Eur J Endocrinol.'],
   },
 
-  // ── Anti-Inflammatory / GI ───────────────────────────────────────────────────
-
-  {
-    id: 'kpv',
-    name: 'KPV',
-    fullName: 'KPV (Lys-Pro-Val)',
-    category: 'anti_inflammatory',
-    route: ['oral', 'subcutaneous injection', 'topical'],
-    goals: ['gut_health', 'inflammation', 'anti_aging'],
-    summary: 'C-terminal tripeptide of alpha-MSH. Potent anti-inflammatory with gut mucosal healing properties. Particularly effective for IBD, Crohn\'s, and colitis.',
-    mechanism: 'Acts on melanocortin receptors (MC1R, MC3R). Inhibits NF-κB pathway and pro-inflammatory cytokines (TNF-α, IL-6, IL-1β). Direct anti-inflammatory action in GI epithelium.',
-    benefits: ['Powerful anti-inflammatory for gut and systemic use', 'Reduces colitis and IBD severity', 'Mucosal healing', 'Skin anti-inflammatory applications', 'Lower side effect profile vs steroids'],
-    dosing: { typical: '500 mcg–1 mg/day', range: '250 mcg–2 mg/day', frequency: 'Once or twice daily', route: ['oral', 'subcutaneous injection', 'topical'], cycle: '4–12 weeks or chronic for IBD', notes: 'Oral effective for GI indications. Injectable for systemic anti-inflammatory effect. Can be stacked with BPC-157 for GI conditions.' },
-    sideEffects: 'Generally well-tolerated. Mild GI upset possible orally.',
-    researchLevel: 'low_emerging',
-    tags: ['tripeptide', 'anti-inflammatory', 'gut healing'],
-  },
-
-  // ── Copper Peptides / Cosmetic ───────────────────────────────────────────────
-
-  {
-    id: 'ghk_cream',
-    name: 'GHK 2% Cosmetic Cream',
-    fullName: 'GHK-Cu 2% Copper Peptide Cosmetic Cream',
-    category: 'cosmetic',
-    route: ['topical'],
-    goals: ['anti_aging', 'skin_health'],
-    summary: 'Topical 2% GHK-Cu cream for skin rejuvenation. One of the best-studied cosmetic peptides. Stimulates collagen, reduces fine lines, improves skin density and elasticity.',
-    mechanism: 'GHK-Cu (glycyl-l-histidyl-l-lysine copper complex) activates skin remodeling: stimulates collagen I, III, and IV synthesis, activates metalloproteinases for damaged protein removal, promotes keratinocyte and fibroblast proliferation.',
-    benefits: ['Collagen synthesis stimulation', 'Reduces fine lines and wrinkles', 'Improves skin elasticity and density', 'Anti-inflammatory on skin', 'Wound healing acceleration', 'Antioxidant protection'],
-    dosing: { typical: 'Apply thin layer to face/neck twice daily', range: 'As directed', frequency: 'Twice daily (AM/PM)', route: ['topical'], cycle: 'Ongoing — results typically seen at 8–12 weeks', notes: 'Apply after cleansing. Can be used with retinol on alternating evenings. Avoid eyes. Store cool and dark.' },
-    sideEffects: 'Rare: mild skin irritation or redness initially. Copper may cause temporary blue-green tint on fair skin.',
-    researchLevel: 'high',
-    tags: ['topical', 'cosmetic', 'copper peptide', 'collagen'],
-  },
-
-  {
-    id: 'ghk_hair',
-    name: 'GHK-Cu Hair Solution',
-    fullName: 'GHK-Cu Copper Peptide Hair Solution',
-    category: 'cosmetic',
-    route: ['topical'],
-    goals: ['hair_growth', 'anti_aging'],
-    summary: 'Topical GHK-Cu formulated for scalp and hair follicle application. Promotes hair follicle enlargement, reduces hair loss, and stimulates new growth.',
-    mechanism: 'GHK-Cu activates hair follicle stem cells, upregulates vascular endothelial growth factor (VEGF) in follicle dermal papilla, enlarges follicle size, and extends anagen (growth) phase.',
-    benefits: ['Promotes hair follicle enlargement', 'Extends hair growth (anagen) phase', 'Reduces miniaturization in androgenic alopecia', 'Stimulates new follicle activity', 'Anti-inflammatory on scalp'],
-    dosing: { typical: 'Apply to scalp once or twice daily', range: 'Concentration varies (0.1–1% GHK-Cu)', frequency: '1–2x daily', route: ['topical scalp application'], cycle: 'Minimum 3–6 months for visible results', notes: 'Apply to clean, dry scalp. Massage in gently. Can be combined with minoxidil or other hair treatments. Results cumulative with continued use.' },
-    sideEffects: 'Generally well-tolerated. Temporary scalp tingling. Possible blue-green tint from copper if over-applied.',
-    researchLevel: 'moderate',
-    tags: ['topical', 'hair', 'copper peptide', 'alopecia'],
-  },
-
-  // ── NAD+ ─────────────────────────────────────────────────────────────────────
-
-  {
-    id: 'nad_nasal',
-    name: 'NAD+ Nasal Spray',
-    fullName: 'NAD+ (Nicotinamide Adenine Dinucleotide) Intranasal',
-    category: 'cellular',
-    route: ['intranasal'],
-    goals: ['mitochondrial', 'mental_clarity', 'fatigue', 'longevity', 'cellular_health'],
-    summary: 'Intranasal NAD+ for systemic delivery with direct CNS access. NAD+ is a critical coenzyme in cellular energy production and DNA repair. Levels decline significantly with age.',
-    mechanism: 'NAD+ is essential for mitochondrial function (electron transport chain), sirtuins (longevity pathways), PARP enzymes (DNA repair), and CD38 signaling. Intranasal route provides CNS delivery.',
-    benefits: ['Improves cellular energy production', 'Activates sirtuin longevity pathways', 'DNA repair support', 'Mental clarity and cognitive function', 'Reduces fatigue', 'Anti-aging at cellular level'],
-    dosing: { typical: '1–2 sprays per nostril, 1–2x daily', range: 'Per compounding pharmacy formulation (typically 50–100 mg/mL)', frequency: 'Daily or as needed', route: ['intranasal spray'], cycle: 'Can be used chronically. Many use 5-day loading courses quarterly.', notes: 'Fast onset for energy/cognitive effects. Synergistic with NAD+ precursors (NMN, NR). Less niacin flushing vs IV. Refrigerate.' },
-    sideEffects: 'Mild nasal irritation. Occasional headache with first use. Generally well-tolerated.',
-    researchLevel: 'moderate',
-    tags: ['intranasal', 'NAD+', 'mitochondrial', 'longevity'],
-  },
-
-  {
-    id: 'nad_injection',
-    name: 'NAD+ Injection',
-    fullName: 'NAD+ (Nicotinamide Adenine Dinucleotide) Injection',
-    category: 'cellular',
-    route: ['subcutaneous injection', 'intravenous'],
-    goals: ['mitochondrial', 'mental_clarity', 'fatigue', 'longevity', 'cellular_health', 'recovery'],
-    summary: 'Injectable NAD+ — subcutaneous or IV. Highest bioavailability and strongest acute effects. IV NAD+ infusions used for addiction, neurological conditions, and aggressive anti-aging protocols.',
-    mechanism: 'Same as nasal NAD+ — direct cellular delivery. IV/SQ bypasses GI and liver first-pass, maximizing systemic NAD+ elevation rapidly.',
-    benefits: ['Rapid, significant NAD+ repletion', 'Strongest cognitive clarity and energy effects', 'IV use in addiction medicine and neurological recovery', 'Maximum mitochondrial support'],
-    dosing: { typical: 'SQ: 50–100 mg/day. IV: 250–1000 mg per infusion', range: 'SQ: 25–200 mg/day. IV: 100–2000 mg per session', frequency: 'SQ: daily. IV: 1–5 days loading, then weekly or monthly maintenance', route: ['subcutaneous injection', 'intravenous infusion'], cycle: 'Loading course then maintenance. SQ can be daily.', notes: 'IV must be administered slowly (2–4 hours) to avoid flushing, nausea, and chest tightness. SQ much better tolerated. Consider monitoring liver enzymes with chronic high-dose use.' },
-    sideEffects: 'IV: Flushing, nausea, chest tightness, muscle cramping if infused too fast. SQ: mild injection site discomfort.',
-    researchLevel: 'moderate',
-    tags: ['injection', 'IV', 'NAD+', 'longevity', 'high impact'],
-  },
-
-  // ── Growth Hormone / HGH ─────────────────────────────────────────────────────
-
-  {
-    id: 'omnitrope',
-    name: 'Omnitrope',
-    fullName: 'Omnitrope (Somatropin) — recombinant Human Growth Hormone',
-    category: 'growth_hormone',
-    route: ['subcutaneous injection'],
-    goals: ['muscle_mass', 'fat_loss', 'anti_aging', 'recovery', 'sleep', 'longevity'],
-    summary: 'FDA-approved recombinant human growth hormone (rHGH). Brand name: Omnitrope. The gold standard GH replacement — provides exogenous GH directly. Used for GH deficiency and off-label anti-aging.',
-    mechanism: 'Direct GH receptor agonism — stimulates IGF-1 production in the liver and peripheral tissues. Promotes lipolysis, protein synthesis, bone density, and cellular repair.',
-    benefits: ['Direct GH replacement', 'Most potent for lean mass and fat loss', 'Improved body composition', 'Skin and connective tissue quality', 'Deep wave sleep enhancement', 'IGF-1 elevation'],
-    dosing: { typical: '1–3 IU/day', range: '0.5–6 IU/day (clinical doses vary)', frequency: 'Daily injection, typically pre-sleep', route: ['subcutaneous injection'], cycle: '3–6 month cycles with breaks; some protocols are chronic', notes: 'Pre-sleep injection mimics natural GH pulse. Monitor IGF-1, fasting glucose, and thyroid. Finger-stick BG monitoring recommended. Requires prescription.' },
-    sideEffects: 'Water retention, carpal tunnel, joint pain, potential insulin resistance, increased fasting glucose. Risk of acromegaly at excessive doses.',
-    researchLevel: 'very_high',
-    tags: ['FDA approved', 'prescription only', 'rHGH', 'direct GH'],
-  },
-
-  // ── Neuropeptides / Wellness ─────────────────────────────────────────────────
-
-  {
-    id: 'oxytocin',
-    name: 'Oxytocin',
-    fullName: 'Oxytocin (neuropeptide)',
-    category: 'neuro',
-    route: ['subcutaneous injection', 'intranasal'],
-    goals: ['mental_clarity', 'wellbeing', 'sexual_function', 'fertility', 'fatigue'],
-    summary: 'Endogenous neuropeptide. The "bonding hormone." Used therapeutically for social anxiety, PTSD, post-partum support, sexual function, and overall wellbeing.',
-    mechanism: 'Activates oxytocin receptors in hypothalamus, amygdala, and peripheral tissues. Modulates dopamine and serotonin pathways. Anti-anxiety, pro-social, analgesic, and anti-inflammatory effects.',
-    benefits: ['Reduces social anxiety and fear response', 'Improves mood and bonding', 'Enhances sexual experience and function', 'Post-partum support', 'Chronic pain modulation', 'Anti-inflammatory effects'],
-    dosing: { typical: 'Intranasal: 20–40 IU as needed. SQ: 10–40 IU', range: '10–80 IU depending on indication and route', frequency: 'As needed (social situations, intimacy) or daily for therapeutic use', route: ['intranasal', 'subcutaneous injection'], cycle: 'As needed or therapeutic cycles of 4–12 weeks', notes: 'Intranasal preferred for CNS effects. SQ for systemic/chronic use. Intranasal: 1–2 sprays each nostril. Store refrigerated.' },
-    sideEffects: 'Generally well-tolerated. Possible uterine contractions (contraindicated in pregnancy). Occasional headache. Rare blood pressure changes.',
-    researchLevel: 'high',
-    tags: ['neuropeptide', 'wellbeing', 'intranasal', 'injection'],
-  },
-
+  // ─── PT-141 ───────────────────────────────────────────────────────────────────
   {
     id: 'pt141',
     name: 'PT-141',
     fullName: 'Bremelanotide (PT-141)',
-    category: 'sexual_health',
-    route: ['subcutaneous injection', 'intranasal'],
-    goals: ['sexual_function', 'fertility', 'wellbeing'],
-    summary: 'Melanocortin receptor agonist. FDA approved (Vyleesi) for HSDD in premenopausal women. Off-label for male sexual dysfunction. Central mechanism — acts on desire, not just blood flow.',
-    mechanism: 'Activates MC3R and MC4R in the hypothalamus and limbic system. Distinctly different from PDE5 inhibitors — works centrally on desire and arousal pathways.',
-    benefits: ['Increases sexual desire and arousal (both sexes)', 'Effective in men unresponsive to PDE5 inhibitors', 'Addresses both physical and psychological components', 'FDA approved for women (HSDD)'],
-    dosing: { typical: '1–2 mg as needed', range: '0.5–2 mg', frequency: '45–90 minutes before activity, as needed', route: ['subcutaneous injection', 'intranasal'], cycle: 'As needed — tolerance develops with frequent use', notes: 'Start low (0.5–1 mg) to assess tolerance. Not for daily use. Avoid in hypertension or CVD history. Nausea dose-dependent.' },
-    sideEffects: 'Nausea (most common, dose-dependent), facial flushing, transient BP elevation. Hyperpigmentation with chronic use at high doses.',
+    aliases: ['Vyleesi', 'Bremelanotide'],
+    category: 'Sexual Health',
+    categoryTag: 'sexual',
+    goals: ['sexual_function'],
+    regulatoryStatus: 'FDA-approved as Vyleesi for hypoactive sexual desire disorder (HSDD) in premenopausal women. Used off-label in men.',
     researchLevel: 'high',
-    tags: ['FDA approved', 'sexual health', 'melanocortin'],
+    summary: 'Melanocortin receptor agonist that acts centrally to increase sexual desire in both men and women. FDA-approved for HSDD. Works via brain pathway rather than vascular (distinct from PDE5 inhibitors).',
+    mechanism: 'Activates melanocortin receptors (MC3R, MC4R) in the hypothalamus and limbic system. Increases dopaminergic and oxytocin signaling, driving sexual motivation centrally.',
+    benefits: [
+      'Increased sexual desire and arousal',
+      'Effective in HSDD in women (FDA-approved)',
+      'Spontaneous erections in men (off-label)',
+      'Works regardless of vascular function (central mechanism)',
+      'On-demand use (no daily dosing required)',
+    ],
+    dosing: {
+      typical: '1.75 mg SC 45 minutes before sexual activity (FDA-approved dose)',
+      range: '0.5–2 mg',
+      route: ['subcutaneous injection', 'intranasal (not approved)'],
+      cycle: 'On-demand, not more than once per 24 hours',
+      notes: 'Onset 45–60 minutes, duration 6–12 hours. Can cause transient nausea — manage with antiemetics if needed.',
+    },
+    sideEffects: 'Nausea (most common), flushing, hyperpigmentation with repeated use, headache, hypertension (transient).',
+    keyReferences: ['Simon JA et al. (2019). Bremelanotide (Vyleesi) for HSDD. Obstet Gynecol.'],
   },
 
-  {
-    id: 'selank',
-    name: 'Selank',
-    fullName: 'Selank (Thr-Lys-Pro-Arg-Pro-Gly-Pro)',
-    category: 'neuro',
-    route: ['intranasal', 'subcutaneous injection'],
-    goals: ['mental_clarity', 'anxiety', 'fatigue', 'cognitive', 'immune'],
-    summary: 'Synthetic tuftsin analogue. Anxiolytic and nootropic developed in Russia. Approved pharmaceutical in Russia/CIS. No sedation or dependence — clean anxiolytic profile.',
-    mechanism: 'Stabilizes enkephalins, modulates GABA-A receptor, increases BDNF, regulates IL-6 and cytokine balance, affects monoamine neurotransmitter turnover.',
-    benefits: ['Anxiolytic without sedation or dependence', 'Cognitive enhancement — memory and learning', 'Immune modulation (antiviral)', 'Reduces mental fatigue', 'Antidepressant effects in some users'],
-    dosing: { typical: '250–500 mcg/day', range: '100–1000 mcg/day', frequency: 'Once or twice daily', route: ['intranasal (preferred)', 'subcutaneous injection'], cycle: '2–4 weeks on, break, repeat as needed', notes: 'Intranasal fast onset. Often stacked with Semax for cognitive optimization. Store refrigerated.' },
-    sideEffects: 'Mild fatigue initially. Occasional mild headache. No withdrawal or dependence noted.',
-    researchLevel: 'moderate',
-    tags: ['intranasal', 'nootropic', 'anxiolytic', 'Russia approved'],
-  },
-
-  {
-    id: 'semax',
-    name: 'Semax',
-    fullName: 'Semax (ACTH 4-7 Pro8 Gly9 Pro10)',
-    category: 'neuro',
-    route: ['intranasal'],
-    goals: ['mental_clarity', 'cognitive', 'fatigue', 'neuroprotection', 'recovery'],
-    summary: 'ACTH-derived nootropic. Among the most studied cognitive peptides. Approved pharmaceutical in Russia for stroke, TBI, and cognitive disorders.',
-    mechanism: 'Stimulates BDNF and NGF production, modulates dopaminergic and serotonergic transmission, neuroprotective via Bcl-2, improves cerebral circulation.',
-    benefits: ['Strong cognitive enhancement — memory, focus, processing speed', 'Neuroprotection and neuroregeneration', 'Reduces mental fatigue', 'Mood elevation', 'Stroke and TBI recovery support'],
-    dosing: { typical: '300–900 mcg/day', range: '200 mcg–2 mg/day', frequency: 'Once or twice daily (morning preferred)', route: ['intranasal'], cycle: '2–4 weeks on, 2 weeks off', notes: 'Intranasal only practical route. Cognitive effects typically noticeable within days. Stack with Selank for anxiety + cognition protocol.' },
-    sideEffects: 'Mild anxiety or irritability at high doses. Transient headache. Generally well-tolerated.',
-    researchLevel: 'moderate',
-    tags: ['intranasal', 'nootropic', 'BDNF', 'Russia approved'],
-  },
-
-  // ── GHRH Analogues / GH Secretagogues ────────────────────────────────────────
-
+  // ─── Sermorelin ───────────────────────────────────────────────────────────────
   {
     id: 'sermorelin',
     name: 'Sermorelin',
     fullName: 'Sermorelin (GHRH 1-29)',
-    category: 'growth_hormone',
-    route: ['subcutaneous injection'],
-    goals: ['muscle_mass', 'fat_loss', 'sleep', 'recovery', 'anti_aging', 'longevity'],
-    summary: 'First 29 amino acids of endogenous GHRH. Stimulates natural, pulsatile GH release from pituitary. FDA approved. Considered the most physiological GHRH analogue.',
-    mechanism: 'Binds GHRH receptor on pituitary somatotrophs — triggers natural GH pulse. Preserves pituitary responsiveness and feedback loop. Downstream IGF-1 elevation.',
-    benefits: ['Stimulates natural GH release', 'Improves sleep quality (deep wave sleep)', 'Improves body composition over time', 'Anti-aging effects on skin and connective tissue', 'FDA approved, well-studied', 'Preserves pituitary axis integrity'],
-    dosing: { typical: '200–500 mcg/day', range: '100–600 mcg/day', frequency: 'Once daily, 30–60 min before sleep', route: ['subcutaneous injection'], cycle: '3–6 months, then break to assess', notes: 'Pre-sleep injection maximizes GH pulse during stage 3–4 sleep. Fasted injection preferred. Often combined with GHRP for synergistic effect.' },
-    sideEffects: 'Water retention, mild headache, facial flushing, injection site reactions.',
+    aliases: ['GHRH 1-29', 'Geref'],
+    category: 'GH Axis',
+    categoryTag: 'gh_axis',
+    goals: ['muscle_mass', 'sleep', 'anti_aging', 'fatigue'],
+    regulatoryStatus: 'Compoundable by prescription. Previously FDA-approved (withdrawn from market 2008 for commercial reasons, not safety).',
     researchLevel: 'high',
-    tags: ['GHRH analogue', 'FDA approved', 'physiological GH'],
-  },
-
-  {
-    id: 'sermorelin_nasal',
-    name: 'Sermorelin Nasal Spray',
-    fullName: 'Sermorelin — Intranasal Formulation',
-    category: 'growth_hormone',
-    route: ['intranasal'],
-    goals: ['muscle_mass', 'fat_loss', 'sleep', 'recovery', 'anti_aging'],
-    summary: 'Intranasal sermorelin for needle-free GH stimulation. Lower bioavailability vs injection but convenient option for needle-averse patients. Good for sleep optimization protocol.',
-    mechanism: 'Same GHRH receptor mechanism as injectable sermorelin. Intranasal absorption via nasal mucosa provides direct CNS delivery and systemic absorption.',
-    benefits: ['Needle-free GH stimulation', 'Improved sleep quality', 'Convenient daily protocol', 'Anti-aging benefits', 'Suitable for patients averse to injection'],
-    dosing: { typical: '1–2 sprays (200–400 mcg) per nostril before sleep', range: '100–600 mcg total dose', frequency: 'Once nightly', route: ['intranasal spray'], cycle: '3–6 months', notes: 'Use 30–60 min before sleep. Absorption ~20–30% of SQ bioavailability — dose accordingly. Keep refrigerated.' },
-    sideEffects: 'Nasal irritation, mild congestion. Systemic effects same as injectable at equivalent doses.',
-    researchLevel: 'moderate',
-    tags: ['intranasal', 'GHRH', 'needle-free', 'sleep'],
-  },
-
-  {
-    id: 'tb500',
-    name: 'TB-500',
-    fullName: 'Thymosin Beta-4 (synthetic fragment TB-500)',
-    category: 'healing',
-    route: ['subcutaneous injection', 'intramuscular injection'],
-    goals: ['recovery', 'injury', 'inflammation', 'muscle_mass', 'cardiac_health'],
-    summary: 'Synthetic Thymosin Beta-4 fragment. Potent tissue repair and regeneration peptide. Often stacked with BPC-157 for accelerated healing protocols.',
-    mechanism: 'Sequesters actin monomers, promotes cell migration and proliferation, upregulates metalloproteinases, stimulates angiogenesis. Promotes cardiac and neural repair.',
-    benefits: ['Accelerates healing of muscle, tendon, ligament', 'Reduces scar tissue formation', 'Cardiac tissue repair', 'Neurological regeneration potential', 'Reduces chronic inflammation', 'Improves flexibility'],
-    dosing: { typical: '2–2.5 mg twice weekly', range: '1–5 mg per injection', frequency: '2x/week loading, then 1x/week maintenance', route: ['subcutaneous injection', 'intramuscular injection'], cycle: '4–6 week loading, then maintenance', notes: 'Classic stack: BPC-157 + TB-500 for synergistic healing. Loading phase is key. Systemic — inject anywhere (abdomen preferred).' },
-    sideEffects: 'Mild fatigue or lethargy. Transient head rush post-injection. Well-tolerated overall.',
-    researchLevel: 'moderate',
-    tags: ['healing', 'regeneration', 'stacked with BPC-157'],
-  },
-
-  {
-    id: 'aod9604',
-    name: 'AOD-9604',
-    fullName: 'AOD-9604 / Fragment 176–191 (hGH C-terminal lipolytic fragment)',
-    category: 'metabolic',
-    route: ['subcutaneous injection'],
-    goals: ['fat_loss', 'visceral_fat', 'metabolic_health', 'recovery', 'anti_aging'],
-
-    summary: 'AOD-9604 is a 16-amino acid synthetic peptide (sequence: YLRIVQCRSVEGSCGF) derived from the C-terminus of human growth hormone (residues 177–191 with an N-terminal tyrosine added for stability). Developed by Monash University / Metabolic Pharmaceuticals in Australia. Studied across 6 human RCTs in ~900 subjects. The pivotal Phase 2b obesity trial failed its primary endpoint in 2007 and FDA approval was not pursued. Now classified as NOT FDA-approved and NOT a legally compoundable drug substance in the US. GRAS designation obtained for food use. Widely available in the gray-market compounding ecosystem. Evidence base is moderate for mechanism, low for clinically meaningful fat loss in humans at doses studied.',
-
-    mechanism: `Dual mechanism — acute and chronic effects operate via distinct pathways:
-ACUTE (β3-AR independent): Directly increases fat oxidation and energy expenditure within minutes of injection. This acute response persists in β3-adrenergic receptor knockout mice, confirming a receptor-independent acute pathway. Mechanism: likely protein kinase C signaling modulating hormone-sensitive lipase and acetyl-CoA carboxylase.
-CHRONIC (β3-AR dependent): Upregulates β3-adrenergic receptor (β3-AR) RNA expression in white and brown adipose tissue — restoring suppressed β3-AR levels in obese adipose tissue to levels comparable with lean tissue. This enhanced receptor expression increases lipolytic sensitivity over time. β3-AR knockout mice do NOT lose weight with chronic AOD9604, confirming β3-AR dependence for long-term fat loss.
-CONFIRMED NEGATIVE FINDINGS (mechanistically important): Does NOT bind the GH receptor (confirmed by competition binding assay, 125I-hGH). Does NOT stimulate IGF-1 (confirmed across all 6 human trials). Does NOT induce insulin resistance or impair glucose tolerance (unlike intact hGH). Does NOT compete with hGH for receptor binding. Inhibits acetyl-CoA carboxylase (antilipogenic). Stimulates hormone-sensitive lipase (lipolytic).`,
-
+    summary: 'First 29 amino acids of GHRH. Longer clinical track record than CJC-1295. Stimulates natural, pulsatile GH release with less risk of desensitization. Entry-level GH axis peptide.',
+    mechanism: 'Binds GHRH receptors on pituitary somatotrophs. Stimulates GH production and release in a physiological pulsatile pattern.',
     benefits: [
-      'Acute fat oxidation and energy expenditure increase (β3-AR independent)',
-      'Chronic lipolysis enhancement via upregulation of β3-adrenergic receptor expression',
-      'No IGF-1 elevation (confirmed across 6 human trials, ~900 subjects)',
-      'No insulin resistance or glucose intolerance (unlike intact hGH)',
-      'No anti-AOD9604 antibody formation in any subject across all trials',
-      'Safety profile indistinguishable from placebo in human trials',
-      'In ob/ob mice: 28% reduction in epididymal fat mass (250 mcg/kg/day x 14 days)',
-      'In Zucker rats: >50% reduction in body weight gain vs control (oral 500 mcg/kg/day x 19 days)',
-      'Can be stacked with GH secretagogues without synergistic glucose effects',
-      'GRAS (Generally Recognized As Safe) designation obtained',
-      'CARTILAGE/OA: Promotes proteoglycan and collagen production in bovine chondrocytes (in vitro)',
-      'CARTILAGE/OA: Enhances differentiation of adipose mesenchymal stem cells into bone',
-      'CARTILAGE/OA: Intra-articular injection reduces cartilage degeneration vs saline control (rabbit model)',
-      'CARTILAGE/OA: AOD9604 + hyaluronic acid combination superior to either alone — lameness recovery 11 days vs 16 (AOD alone) vs 15 (HA alone) vs 25 (saline)',
+      'Natural pulsatile GH release',
+      'Improved sleep quality',
+      'Body composition improvement (gradual)',
+      'Anti-aging effects',
+      'Longer safety record than newer GHRH analogues',
     ],
-
-    intraArticularProtocol: {
-      indication: 'Osteoarthritis — knee and potentially other joints',
-      rationale: 'AOD9604 promotes cartilage repair via proteoglycan/collagen synthesis stimulation without IGF-1 elevation or glucose interference — safer joint profile than intra-articular hGH',
-      dose: '0.25 mg AOD9604 per injection (0.6 mL volume)',
-      doseBasis: 'Molar equivalent of 3 mg hGH (the validated GH dose for OA cartilage studies)',
-      combination: '0.25 mg AOD9604 + 6 mg hyaluronic acid — significantly superior to either alone. HA provides chondrocyte protection and extends AOD9604 joint residence time',
-      frequency: 'Weekly injections x 4–7 weeks',
-      guidance: 'Ultrasound guidance strongly recommended for accurate intra-articular placement',
-      keyFinding: 'Kwon & Park 2015 (n=32 rabbits, collagenase-induced OA model): Combined AOD9604+HA showed significantly better gross morphological scores, histopathological scores (Modified Mankin), and lameness recovery than HA alone, AOD9604 alone, or saline. No significant difference between HA alone and AOD9604 alone.',
-      mechanism: 'Promotes proteoglycan and collagen synthesis in chondrocytes. Enhances mesenchymal stem cell differentiation into bone. Retains partial GH-like cartilage functions without IGF-1 stimulation.',
-      safetyAdvantage: 'Unlike intra-articular hGH: no IGF-1 stimulation, no cartilage hypertrophy risk, no subchondral bone geometry alteration, no systemic glucose effects',
-      citation: 'Kwon DR, Park GY. Effect of Intra-articular Injection of AOD9604 with or without Hyaluronic Acid in Rabbit Osteoarthritis Model. Ann Clin Lab Sci. 2015;45(4):426-432.',
-    },
-
-    clinicalTrials: {
-      human: [
-        { id: 'METAOD001', phase: 'I', design: 'DB-PC dose escalation', n: 15, route: 'IV', dose: '25–400 mcg/kg', duration: 'Single dose', finding: 'Safe and well tolerated. No IGF-1 changes, no glucose changes.' },
-        { id: 'METAOD002', phase: 'IIa', design: 'DB-PC Latin Square', n: 23, route: 'IV', dose: '25–100 mcg/kg', duration: 'Single dose', finding: 'Safe in obese males. No IGF-1 or glucose effects.' },
-        { id: 'METAOD003', phase: 'IIa', design: 'DB-PC Latin Square', n: 17, route: 'Oral', dose: '9–54 mg', duration: 'Single dose', finding: 'Safe orally. Mild GI effects at 54mg. No IGF-1 changes.' },
-        { id: 'METAOD004', phase: 'IIa', design: 'DB-PC', n: 36, route: 'Oral', dose: '9–54 mg/day', duration: '7 days', finding: 'Safe. No OGTT changes, no IGF-1 changes. GI events at 54mg.' },
-        { id: 'METAOD005', phase: 'IIb', design: 'DB-PC multi-center', n: 300, route: 'Oral', dose: '1–30 mg/day', duration: '12 weeks', finding: 'Weight loss: 1mg group showed 0.22 kg/wk vs 0.07 kg/wk placebo (p<0.001). No IGF-1 changes. No OGTT changes. No antibodies detected. Safety profile indistinguishable from placebo.' },
-        { id: 'METAOD006', phase: 'IIb', design: 'DB-PC multi-center', n: 502, route: 'Oral', dose: '0.25–1 mg/day', duration: '24 weeks', finding: 'FAILED primary endpoint. No significant weight loss vs placebo at lower doses. Excellent safety profile. No IGF-1, glucose, or antibody effects.' },
-      ],
-      keyAnimal: [
-        { citation: 'Ng et al., Horm Res 2000', model: 'Zucker fa/fa rats', dose: '500 mcg/kg/day oral', duration: '19 days', finding: '>50% reduction in body weight gain. 23% increase in adipose tissue lipolysis. No effect on insulin sensitivity (unlike intact hGH). Confirms oral bioavailability.' },
-        { citation: 'Heffernan et al., Endocrinology 2001', model: 'ob/ob mice + β3-AR knockout mice', dose: '250 mcg/kg/day IP', duration: '14–28 days', finding: 'ob/ob mice: 28% reduction in epididymal fat, significant brown adipose tissue reduction. β3-AR KO mice: NO chronic weight loss (confirms β3-AR dependence for chronic effects). Acute fat oxidation increase persists in KO mice (confirms β3-AR independent acute mechanism).' },
-      ],
-    },
-
     dosing: {
-      typical: '300 mcg/day SQ (compounding-era protocol)',
-      range: '250–500 mcg/day SQ injection; oral doses studied up to 30 mg/day (no clear dose response for weight loss)',
-      frequency: 'Once daily, fasted — morning injection preferred for lipolytic effect',
+      typical: '200–300 mcg SC before bed',
+      range: '100–500 mcg/day',
       route: ['subcutaneous injection'],
-      cycle: '12–16 weeks with caloric restriction and exercise',
-      notes: `IMPORTANT CONTEXT: The typical compounding-era protocol (300 mcg/day SQ) has NOT been validated in human RCTs — human trials used oral administration. The injectable SQ protocol is extrapolated from animal data and clinical experience, not clinical trial data.
-OPTIMAL TIMING: Fasted state (AM or pre-exercise) maximizes lipolytic effect. Avoid carbohydrate intake for 30–60 min post-injection.
-STACKING: Can be combined with Ipamorelin/CJC-1295 for body composition — no synergistic glucose/IGF-1 concerns.
-RECONSTITUTION: Reconstitute with bacteriostatic water. Stable refrigerated. Each vial typically 2–5 mg.
-DOSE NOTE: Human oral trials showed modest weight loss only at 1 mg/day. The 300 mcg SQ compounding dose is a clinical convention, not an evidence-based target.
-REGULATORY NOTE: Not FDA approved. Not legally compoundable in the US as of current guidance. Available in gray-market compounding. Verify legal status in jurisdiction.`,
+      cycle: '3–6 months minimum for meaningful results',
+      notes: 'Bedtime dosing essential. Shorter half-life than CJC-1295; requires nightly dosing. Good entry point for GH axis therapy.',
     },
-
-    sideEffects: `HUMAN TRIAL DATA (Stier et al., J Endocrinol Metab 2013 — summary of all 6 trials, ~900 subjects):
-— Safety profile indistinguishable from placebo across all dose ranges
-— No drug-related serious adverse events or withdrawals in any of the 6 trials
-— No effect on IGF-1 (confirmed at all time points, all doses, all studies)
-— No glucose intolerance or insulin resistance (OGTT normal throughout)
-— No anti-AOD9604 antibodies detected in any subject
-— At 54 mg oral (highest dose studied): increased GI adverse events (headache, diarrhea, flatulence)
-— At doses ≤30 mg/day: AE profile comparable to placebo
-— 5 SAEs in 12-week trial (skin cancers, 1 breast cancer) — investigator assessed as unrelated to treatment; no dose-response pattern; attributed to high baseline cancer risk in obese Australian cohort
-INJECTABLE (extrapolated/clinical): Mild injection site reaction. No systemic concerns at typical 300 mcg doses.`,
-
-    researchLevel: 'high',
-    researchNote: 'High evidence for SAFETY (6 human RCTs, ~900 subjects). Low-moderate evidence for EFFICACY in humans — modest weight loss in Phase 2b, primary endpoint failed, development discontinued for obesity. Strong animal mechanistic data. Compounding use extrapolated from animal models and lower-dose human oral trials.',
-
-    keyReferences: [
-      { citation: 'Ng FM et al. (2000)', title: 'Metabolic Studies of a Synthetic Lipolytic Domain (AOD9604) of Human Growth Hormone', journal: 'Hormones Research 53:274–278', url: 'https://doi.org/10.1159/000023574' },
-      { citation: 'Heffernan MA et al. (2001)', title: 'The Effects of Human GH and Its Lipolytic Fragment (AOD9604) on Lipid Metabolism Following Chronic Treatment in Obese Mice and β3-AR Knock-Out Mice', journal: 'Endocrinology 142(12):5182–5189', url: 'https://doi.org/10.1210/endo.142.12.8516' },
-      { citation: 'Wittert G et al. (2005)', title: 'AOD9604, an Orally Active Peptide for the Treatment of Obesity: Results of a Phase 2b Study', journal: 'Diabetes 54(Suppl):A440' },
-      { citation: 'Stier H et al. (2013)', title: 'Safety and Tolerability of the Hexadecapeptide AOD9604 in Humans', journal: 'J Endocrinol Metab 3(1-2):7–15', url: 'https://doi.org/10.4021/jem157w' },
-      { citation: 'Kwon DR, Park GY (2015)', title: 'Effect of Intra-articular Injection of AOD9604 with or without Hyaluronic Acid in Rabbit Osteoarthritis Model', journal: 'Ann Clin Lab Sci 45(4):426–432', url: 'https://www.annclinlabsci.org' },
-    ],
-
-    tags: ['fat loss', 'HGH fragment', 'lipolytic', 'no IGF-1', 'no insulin resistance', 'GRAS', 'gray-market US', 'trial failed 2007', '6 human RCTs', 'intra-articular OA', 'cartilage regeneration'],
+    sideEffects: 'Generally very well-tolerated. Mild flushing, tingling, headache.',
+    keyReferences: ['Walker RF. (2006). Sermorelin: a better approach to management of adult-onset GH insufficiency? Clin Interv Aging.'],
   },
 
+  // ─── Tesamorelin ──────────────────────────────────────────────────────────────
   {
     id: 'tesamorelin',
     name: 'Tesamorelin',
-    fullName: 'Tesamorelin (GHRH analogue)',
-    category: 'growth_hormone',
-    route: ['subcutaneous injection'],
-    goals: ['fat_loss', 'visceral_fat', 'muscle_mass', 'cognitive', 'anti_aging'],
-    summary: 'FDA-approved GHRH analogue. Originally approved for HIV-associated lipodystrophy. Potent visceral fat reduction with GH stimulation. Strong evidence base.',
-    mechanism: 'Binds GHRH receptor — stimulates pulsatile GH release with downstream IGF-1 elevation. Specifically studied for visceral adiposity reduction via GH/IGF-1 lipolytic axis.',
-    benefits: ['Significant visceral fat reduction (FDA-approved indication)', 'Lean mass preservation and improvement', 'IGF-1 elevation', 'Cognitive benefits in older adults', 'Cardiovascular risk marker improvement'],
-    dosing: { typical: '1–2 mg/day', range: '1–2 mg/day', frequency: 'Once daily, pre-sleep or morning fasted', route: ['subcutaneous injection'], cycle: '3–6 months; FDA data supports chronic use', notes: 'Most potent GHRH analogue for visceral fat. Monitor IGF-1 quarterly. Best studied GHRH in humans for body composition.' },
-    sideEffects: 'Injection site reactions, arthralgia, water retention. Monitor glucose (less effect than exogenous HGH but present).',
-    researchLevel: 'very_high',
-    tags: ['FDA approved', 'GHRH', 'visceral fat', 'potent'],
-  },
-
-  {
-    id: 'ipamorelin',
-    name: 'Ipamorelin',
-    fullName: 'Ipamorelin (selective GH secretagogue)',
-    category: 'growth_hormone',
-    route: ['subcutaneous injection'],
-    goals: ['muscle_mass', 'fat_loss', 'sleep', 'recovery', 'anti_aging', 'longevity'],
-    summary: 'Selective GH secretagogue and ghrelin receptor agonist. The cleanest GH-releasing peptide — minimal cortisol, prolactin, or ACTH elevation.',
-    mechanism: 'Selectively activates GHS-R1a (ghrelin receptor) on pituitary somatotrophs. Stimulates GH release with minimal effect on other pituitary hormones — cleaner profile than GHRP-2 or GHRP-6.',
-    benefits: ['Clean GH release without cortisol spike', 'Lean body composition', 'Deep wave sleep quality', 'Recovery enhancement', 'Anti-aging effects', 'Long-term use compatibility'],
-    dosing: { typical: '200–300 mcg/injection', range: '100–500 mcg/injection', frequency: '1–3x daily — fasted or pre-sleep', route: ['subcutaneous injection'], cycle: 'Can be used long-term. 3–6 month cycles common.', notes: 'Gold standard: Ipamorelin + CJC-1295 (no DAC) = large physiological GH pulse. Inject 30–60 min before sleep.' },
-    sideEffects: 'Very well-tolerated. Mild water retention, transient tingling, hunger at high doses.',
+    fullName: 'Tesamorelin (Egrifta)',
+    aliases: ['Egrifta', 'TH9507'],
+    category: 'GH Axis / Metabolic',
+    categoryTag: 'gh_axis',
+    goals: ['visceral_fat', 'metabolic_health', 'mental_clarity'],
+    regulatoryStatus: 'FDA-approved (Egrifta) for HIV-associated lipodystrophy. Compoundable off-label.',
     researchLevel: 'high',
-    tags: ['GH secretagogue', 'clean profile', 'gold standard stack'],
+    summary: 'GHRH analogue with FDA approval for visceral adiposity in HIV lipodystrophy. Uniquely potent for visceral fat reduction. Also under investigation for cognitive decline and NASH.',
+    mechanism: 'Stabilized GHRH analogue. Increases GH pulsatility, elevating IGF-1. Preferential effect on visceral adipose tissue lipolysis.',
+    benefits: [
+      'Superior visceral fat reduction vs other GHRH analogues',
+      'Improved waist circumference and trunk fat',
+      'Cognitive benefits in MCI (Alzheimer\'s prevention studies)',
+      'Liver fat reduction in NASH',
+      'FDA-approved safety profile',
+    ],
+    dosing: {
+      typical: '1–2 mg SC daily',
+      range: '1–2 mg/day',
+      route: ['subcutaneous injection'],
+      cycle: 'Chronic ongoing (FDA trial ran 12+ months)',
+      notes: 'Injected in the morning (unlike other GHRHs). Good choice when visceral fat is primary target.',
+    },
+    sideEffects: 'Edema, arthralgia, carpal tunnel (GH-related). Well-characterized safety from clinical trials.',
+    keyReferences: ['Falutz J et al. (2010). Tesamorelin for visceral fat in HIV. NEJM.'],
   },
 
+  // ─── Kisspeptin-10 ────────────────────────────────────────────────────────────
   {
-    id: 'cjc1295',
-    name: 'CJC-1295 (No DAC)',
-    fullName: 'CJC-1295 without DAC (Modified GRF 1-29)',
-    category: 'growth_hormone',
-    route: ['subcutaneous injection'],
-    goals: ['muscle_mass', 'fat_loss', 'sleep', 'recovery', 'anti_aging'],
-    summary: 'Modified GHRH 1-29 without Drug Affinity Complex. Short half-life creates physiological GH pulse. Combined with Ipamorelin as the premier GH-stimulating stack.',
-    mechanism: 'Binds GHRH receptors on pituitary with ~30-minute half-life — creates single, large, physiological GH pulse when combined with GHRP like Ipamorelin.',
-    benefits: ['Physiological pulsatile GH release', 'Synergistic with Ipamorelin', 'Lean mass and fat loss over time', 'Sleep quality improvement', 'Anti-aging effects on skin and joints'],
-    dosing: { typical: '100–300 mcg/injection', range: '100–300 mcg', frequency: '1–3x daily, fasted', route: ['subcutaneous injection'], cycle: '3–6 months', notes: 'Always combine with Ipamorelin or another GHRP for maximum GH pulse. Inject simultaneously in same or adjacent sites. Pre-sleep timing optimal.' },
-    sideEffects: 'Water retention, mild fatigue, tingling. Well-tolerated.',
-    researchLevel: 'high',
-    tags: ['GHRH', 'no DAC', 'combination peptide'],
-  },
-
-  {
-    id: 'ipamorelin_cjc',
-    name: 'Ipamorelin/CJC',
-    fullName: 'Ipamorelin + CJC-1295 (No DAC) — Combination',
-    category: 'growth_hormone',
-    route: ['subcutaneous injection'],
-    goals: ['muscle_mass', 'fat_loss', 'sleep', 'recovery', 'anti_aging', 'longevity'],
-    summary: 'The gold standard GH peptide combination. Ipamorelin (GHRP) + CJC-1295 No DAC (GHRH) together produce a large, synergistic, physiological GH pulse superior to either alone.',
-    mechanism: 'Dual-mechanism synergy: GHRH (CJC) primes the pituitary, GHRP (Ipamorelin) amplifies the GH pulse via separate receptor pathway. Together produce 2–4x the GH release of either alone.',
-    benefits: ['Maximum physiological GH stimulation', 'Enhanced lean mass and fat loss vs either peptide alone', 'Superior sleep quality improvement', 'Accelerated recovery and tissue repair', 'Comprehensive anti-aging effects'],
-    dosing: { typical: 'Ipamorelin 200–300 mcg + CJC 100–300 mcg per injection', range: 'Both dosed equally — 100–300 mcg each', frequency: '1–3x daily, fasted — bedtime injection preferred', route: ['subcutaneous injection'], cycle: '3–6 months', notes: 'Mix in same syringe or inject separately at adjacent sites. Pre-sleep is highest yield timing. This is the preferred protocol for most body composition and anti-aging goals.' },
-    sideEffects: 'Mild water retention, tingling, morning grogginess if overdosed. Generally very well tolerated.',
-    researchLevel: 'high',
-    tags: ['combination', 'gold standard', 'GH stack', 'most popular'],
-  },
-
-  // ── Mitochondrial ────────────────────────────────────────────────────────────
-
-  {
-    id: 'ss31',
-    name: 'SS-31',
-    fullName: 'SS-31 (Elamipretide) — Szeto-Schiller peptide 31',
-    category: 'mitochondrial',
-    route: ['subcutaneous injection'],
-    goals: ['mitochondrial', 'cellular_health', 'longevity', 'recovery', 'cardiac_health'],
-    summary: 'Mitochondria-targeted antioxidant peptide. Localizes to the inner mitochondrial membrane (cardiolipin). Restores mitochondrial function in aging and disease.',
-    mechanism: 'Concentrates in the inner mitochondrial membrane by binding cardiolipin. Reduces mitochondrial ROS, restores electron transport chain efficiency, prevents mPTP opening. Cardioprotective.',
-    benefits: ['Restores mitochondrial bioenergetics', 'Reduces mitochondrial oxidative stress', 'Cardioprotective — studied in heart failure', 'Renal protective', 'Improves exercise capacity in aging', 'Enhances cellular ATP production'],
-    dosing: { typical: '0.25–0.5 mg/kg/day (or 20–40 mg flat dose)', range: '10–80 mg/day depending on protocol', frequency: 'Daily or every other day', route: ['subcutaneous injection'], cycle: '4–12 weeks, 1–2x per year', notes: 'Emerging longevity protocol. Often combined with MOTS-c and Humanin for comprehensive mitochondrial support. Store at -20°C.' },
-    sideEffects: 'Limited human data outside clinical trials. Injection site reactions. Generally well-tolerated in trials.',
-    researchLevel: 'moderate',
-    tags: ['mitochondrial', 'cardiolipin', 'anti-aging', 'SS peptide'],
-  },
-
-  {
-    id: 'motsc',
-    name: 'MOTS-c',
-    fullName: 'MOTS-c (Mitochondrial Open Reading Frame of 12S rRNA-c)',
-    category: 'mitochondrial',
-    route: ['subcutaneous injection'],
-    goals: ['mitochondrial', 'longevity', 'muscle_mass', 'fat_loss', 'metabolic_health', 'cellular_health'],
-    summary: 'Mitochondrial-derived peptide (MDP). Regulates metabolic homeostasis, exercise capacity, and aging. Declines significantly with age. Mimics exercise at the cellular level.',
-    mechanism: 'Activates AMPK pathway, improves mitochondrial function and biogenesis, regulates glucose utilization, anti-inflammatory via nuclear translocation to regulate gene expression.',
-    benefits: ['Improves insulin sensitivity and metabolic health', 'Mimics exercise benefits on mitochondria', 'Increases exercise capacity and endurance', 'Anti-inflammatory', 'Extends lifespan in animal models', 'Regulates body weight'],
-    dosing: { typical: '5–10 mg/week', range: '2.5–15 mg/week', frequency: 'Daily or every other day', route: ['subcutaneous injection'], cycle: '4–8 weeks, 1–2x per year', notes: 'Exercise synergy is significant — best outcomes when combined with physical activity. Emerging protocols still being established.' },
-    sideEffects: 'Limited human data. Generally well-tolerated. Injection site reactions.',
-    researchLevel: 'low_emerging',
-    tags: ['mitochondrial', 'MDP', 'AMPK', 'metabolic'],
-  },
-
-  // ── Fertility / Hormonal ─────────────────────────────────────────────────────
-
-  {
-    id: 'hcg',
-    name: 'hCG (Pregnyl/Novarel/Ovidrel)',
-    fullName: 'Human Chorionic Gonadotropin (hCG)',
-    category: 'hormonal',
-    route: ['subcutaneous injection', 'intramuscular injection'],
-    goals: ['fertility', 'hormonal_balance', 'sexual_function', 'muscle_mass'],
-    summary: 'Human chorionic gonadotropin. LH analogue — stimulates testosterone production and maintains testicular/ovarian function. FDA approved. Critical for fertility and testosterone therapy adjuncts.',
-    mechanism: 'Mimics LH — binds LH receptors on Leydig cells (testes) and corpus luteum (ovaries). Stimulates testosterone and progesterone synthesis. Maintains gonadal function during testosterone therapy.',
-    benefits: ['Maintains natural testosterone production during TRT', 'Testicular volume preservation during TRT', 'Fertility support for men on TRT', 'Ovulation induction in women (fertility)', 'Stimulates testosterone in hypogonadal men'],
-    dosing: { typical: 'Men (TRT adjunct): 250–500 IU 2–3x/week. Fertility: 1000–2000 IU 3x/week', range: '250–5000 IU depending on indication', frequency: '2–3x weekly (SQ or IM)', route: ['subcutaneous injection', 'intramuscular injection'], cycle: 'Ongoing during TRT; cycles for fertility', notes: 'Requires prescription. Reconstitute with bacteriostatic water. Store refrigerated after reconstitution. Monitor LH/FSH/testosterone levels.' },
-    sideEffects: 'Gynecomastia (aromatization to estradiol), acne, water retention. Testicular achiness. Desensitization with chronic high-dose use.',
-    researchLevel: 'very_high',
-    tags: ['FDA approved', 'fertility', 'LH analogue', 'TRT adjunct'],
-  },
-
-  {
-    id: 'gonadorelin',
-    name: 'Gonadorelin',
-    fullName: 'Gonadorelin (GnRH analogue)',
-    category: 'hormonal',
-    route: ['subcutaneous injection'],
-    goals: ['fertility', 'hormonal_balance'],
-    summary: 'Synthetic GnRH (gonadotropin-releasing hormone). Stimulates pituitary release of LH and FSH. Used as hCG alternative during TRT to maintain HPG axis function.',
-    mechanism: 'Pulsatile activation of GnRH receptors on pituitary gonadotrophs → LH and FSH release → downstream testosterone and spermatogenesis. Pulsatile administration is key.',
-    benefits: ['Maintains HPG axis during TRT', 'Preserves testicular function and size', 'Maintains fertility on testosterone therapy', 'Lower estrogen conversion vs hCG', 'Maintains FSH (sperm production)'],
-    dosing: { typical: '100 mcg twice weekly', range: '50–200 mcg per dose, 2–3x weekly', frequency: '2–3x weekly SQ', route: ['subcutaneous injection'], cycle: 'Ongoing during testosterone therapy', notes: 'Increasingly preferred over hCG due to lower aromatization. Pulsatile SQ injections mimic natural GnRH secretion. Monitor LH, FSH, testosterone levels.' },
-    sideEffects: 'Injection site reactions. Less gynecomastia risk than hCG. Headache occasionally.',
-    researchLevel: 'high',
-    tags: ['GnRH', 'fertility', 'TRT adjunct', 'HPG axis'],
-  },
-
-  {
-    id: 'kisspeptin',
+    id: 'kisspeptin10',
     name: 'Kisspeptin-10',
-    fullName: 'Kisspeptin-10',
-    category: 'hormonal',
-    route: ['subcutaneous injection'],
-    goals: ['fertility', 'hormonal_balance', 'sexual_function'],
-    summary: 'Endogenous neuropeptide activating GnRH neurons. Key regulator of HPG axis. Used in fertility medicine. Stimulates natural LH/FSH release upstream of GnRH.',
-    mechanism: 'Activates KISS1R (GPR54) on GnRH neurons in the hypothalamus → GnRH pulse → LH/FSH release → sex hormone production. Most upstream HPG axis intervention.',
-    benefits: ['Stimulates LH and FSH release', 'Supports natural testosterone in men', 'Fertility treatment — IVF protocols', 'Regulates HPG axis naturally', 'Sexual desire and arousal'],
-    dosing: { typical: '1–2 mcg/kg body weight', range: '0.5–3 mcg/kg', frequency: 'Pulsatile (every 90–120 min mimics physiology) or 1–2x/day', route: ['subcutaneous injection'], cycle: '2–4 week cycles', notes: 'Pulsatile admin most physiological. Used clinically in IVF. Emerging fertility medicine. Human clinical trial data from UK fertility programs.' },
-    sideEffects: 'Facial flushing, mild nausea at higher doses. Generally well-tolerated.',
-    researchLevel: 'high',
-    tags: ['fertility', 'HPG axis', 'kisspeptin', 'GnRH upstream'],
+    fullName: 'Kisspeptin-10 (KP-10)',
+    aliases: ['KP-10', 'Metastin fragment'],
+    category: 'Fertility & Hormonal',
+    categoryTag: 'fertility',
+    goals: ['fertility', 'sexual_function'],
+    regulatoryStatus: 'Investigational. Not FDA-approved. Research use.',
+    researchLevel: 'moderate',
+    summary: 'Endogenous neuropeptide that stimulates GnRH release, driving LH and FSH secretion. Used for fertility restoration, hypogonadism support, and sexual function improvement.',
+    mechanism: 'Binds KISS1R receptors on GnRH neurons in hypothalamus, triggering GnRH pulse → pituitary LH/FSH surge → gonadal steroidogenesis.',
+    benefits: [
+      'Stimulates natural LH and testosterone production',
+      'Fertility enhancement (oocyte maturation, sperm production)',
+      'Restores HPG axis in functional hypogonadotropic hypogonadism',
+      'Sexual desire and arousal (central mechanism)',
+    ],
+    dosing: {
+      typical: '9.6 nmol/kg IV (clinical trial) or 50–100 mcg SC',
+      range: 'Variable — clinical dosing in research context',
+      route: ['subcutaneous injection', 'intravenous (clinical trials)'],
+      cycle: 'Pulsatile protocols; cycle design varies by indication',
+      notes: 'Pulsatile administration required to avoid desensitization. Emerging clinical use in fertility medicine.',
+    },
+    sideEffects: 'Generally well-tolerated. Transient LH surge. Limited long-term data.',
+    keyReferences: ['Jayasena CN et al. (2014). Kisspeptin-54 and sexual function. J Clin Invest.'],
   },
 
-  // ── Immune / Thymic ──────────────────────────────────────────────────────────
+  // ─── GHK-Cu ───────────────────────────────────────────────────────────────────
+  {
+    id: 'ghkcu',
+    name: 'GHK-Cu',
+    fullName: 'Copper Peptide GHK-Cu',
+    aliases: ['GHK', 'Copper tripeptide-1'],
+    category: 'Skin & Anti-Aging',
+    categoryTag: 'anti_aging',
+    goals: ['anti_aging', 'recovery', 'inflammation'],
+    regulatoryStatus: 'GRAS. Used in cosmetics and compounded formulations. Not FDA-approved as drug.',
+    researchLevel: 'moderate',
+    summary: 'Naturally occurring copper-binding tripeptide (Gly-His-Lys). Potent wound healing, anti-inflammatory, and antioxidant properties. Widely used in skin care and increasingly studied for systemic anti-aging and neuroprotection.',
+    mechanism: 'Chelates copper → activates SOD (antioxidant), collagen and elastin synthesis, angiogenesis, and anti-inflammatory pathways. Upregulates VEGF, FGF, TGF-β. Downregulates TNF-α and IL-1.',
+    benefits: [
+      'Skin collagen and elastin synthesis',
+      'Wound healing acceleration',
+      'Hair follicle stimulation and hair growth',
+      'Anti-inflammatory systemically',
+      'Antioxidant via SOD activation',
+      'Neuroprotective (emerging research)',
+    ],
+    dosing: {
+      typical: '1–2 mg/day SC or topical application',
+      range: '0.5–3 mg/day',
+      route: ['subcutaneous injection', 'topical cream/serum'],
+      cycle: '8–12 weeks',
+      notes: 'Topical use: 1–5% concentration serums. Injectable GHK-Cu often combined with BPC-157 for wound/skin healing stacks.',
+    },
+    sideEffects: 'Excellent safety profile. Topical: mild irritation. Systemic: minimal reported effects.',
+    keyReferences: ['Pickart L & Margolina A. (2018). Regenerative and protective actions of GHK-Cu. Biomolecules.'],
+  },
 
+  // ─── Epithalon ────────────────────────────────────────────────────────────────
+  {
+    id: 'epithalon',
+    name: 'Epithalon',
+    fullName: 'Epithalamin / Epithalon',
+    aliases: ['Epitalon', 'AEDG peptide', 'Ala-Glu-Asp-Gly'],
+    category: 'Longevity & Anti-Aging',
+    categoryTag: 'longevity',
+    goals: ['longevity', 'anti_aging', 'sleep', 'fatigue'],
+    regulatoryStatus: 'Not FDA-approved. Research peptide.',
+    researchLevel: 'moderate',
+    summary: 'Tetrapeptide from the pineal gland. Studied for its telomerase activation properties, anti-aging effects, and circadian rhythm regulation. One of the most researched anti-aging peptides in Russian geroscience.',
+    mechanism: 'Activates telomerase enzyme → extends telomere length. Regulates pineal gland melatonin secretion. Antioxidant effects. Suppresses oncogene expression in some models.',
+    benefits: [
+      'Telomere extension (in vitro and animal data)',
+      'Improved sleep via melatonin regulation',
+      'Extended lifespan in animal models',
+      'Antioxidant, anti-tumor properties in animal studies',
+      'Retinal function preservation',
+    ],
+    dosing: {
+      typical: '5–10 mg/day SC, cyclically',
+      range: '5–10 mg/day for 10–20 day courses',
+      route: ['subcutaneous injection'],
+      cycle: '10–20 days, 1–2x/year (typical geroscience protocol)',
+      notes: 'Most evidence from Russian research groups. Human clinical evidence limited.',
+    },
+    sideEffects: 'Well-tolerated in studies. No significant adverse events reported.',
+    keyReferences: ['Khavinson V et al. (2003). Epithalamin and aging. Annals NY Acad Sci.'],
+  },
+
+  // ─── Thymosin Alpha-1 ─────────────────────────────────────────────────────────
   {
     id: 'thymosin_alpha1',
     name: 'Thymosin Alpha-1',
-    fullName: 'Thymosin Alpha-1 (Tα1)',
-    category: 'immune',
-    route: ['subcutaneous injection'],
-    goals: ['immune_health', 'longevity', 'anti_aging', 'fatigue', 'cellular_health'],
-    summary: 'Thymic peptide. Powerful immune modulator and regulator. FDA Orphan Drug designation. Used globally for chronic infections, immune deficiency, and cancer immunotherapy.',
-    mechanism: 'Activates dendritic cells, NK cells, and T-lymphocytes. Upregulates MHC class II expression. Modulates Th1/Th2 balance. Activates TLR9 signaling. Direct immune surveillance enhancement.',
-    benefits: ['Immune system normalization and enhancement', 'Improves response to chronic viral infections (Hep B/C, HIV)', 'Used alongside cancer immunotherapy', 'Reduces immunosenescence (immune aging)', 'Antifungal and antimicrobial properties', 'Reduces fatigue in immune-compromised patients'],
-    dosing: { typical: '1.6 mg twice weekly', range: '0.8–3.2 mg, 2–3x/week', frequency: '2x weekly SQ', route: ['subcutaneous injection'], cycle: '4–12 weeks; some chronic protocols for longevity', notes: 'Thymosin Alpha-1 used in over 35 countries (brand: Zadaxin). FDA orphan status. Excellent safety profile across decades of research.' },
-    sideEffects: 'Excellent safety profile. Mild injection site reaction. Rare: mild flu-like symptoms.',
+    fullName: 'Thymosin Alpha-1 (Zadaxin)',
+    aliases: ['Tα1', 'Zadaxin', 'TA1'],
+    category: 'Immune Modulation',
+    categoryTag: 'immune',
+    goals: ['inflammation', 'fatigue', 'longevity'],
+    regulatoryStatus: 'FDA-approved in some countries (Zadaxin) for hepatitis B/C and immune deficiency. Used off-label in US via compounding.',
     researchLevel: 'high',
-    tags: ['immune', 'thymic', 'Zadaxin', 'immunomodulator'],
+    summary: 'Endogenous thymic peptide that modulates immune function — primarily T-cell differentiation and activation. Used for chronic infections, immune deficiency, and as an adjuvant in cancer therapy.',
+    mechanism: 'Binds TLR2 and TLR9 on dendritic cells and T-cells. Enhances Th1 differentiation, NK cell activity, IL-2 and IFN-γ production. Reduces excessive Th2/inflammatory response in autoimmunity.',
+    benefits: [
+      'Enhances T-cell immunity (Th1 response)',
+      'Antiviral: hepatitis B/C, COVID-19 (studied)',
+      'Adjuvant in cancer immunotherapy',
+      'Reduces chronic fatigue in immune-compromised patients',
+      'Autoimmune modulation',
+    ],
+    dosing: {
+      typical: '1.6 mg SC twice weekly (Zadaxin standard)',
+      range: '0.8–3.2 mg/dose',
+      route: ['subcutaneous injection'],
+      cycle: '6–12 months for chronic conditions; shorter for acute immune support',
+      notes: 'Well-established clinical dosing from Zadaxin trials.',
+    },
+    sideEffects: 'Very well-tolerated. Injection site reactions. No significant systemic adverse effects in trials.',
+    keyReferences: ['Tuthill CW et al. (1994). Thymosin alpha-1 clinical use. Ann NY Acad Sci.'],
   },
 
-  // ── GH Secretagogues ─────────────────────────────────────────────────────────
-
+  // ─── Selank ───────────────────────────────────────────────────────────────────
   {
-    id: 'hexarelin',
-    name: 'Hexarelin',
-    fullName: 'Hexarelin (GHRP-6 analogue)',
-    category: 'growth_hormone',
-    route: ['subcutaneous injection'],
-    goals: ['muscle_mass', 'fat_loss', 'cardiac_health', 'recovery', 'anti_aging'],
-    summary: 'Most potent GHRP (growth hormone releasing peptide). Also has direct cardiac receptor agonism independent of GH release. Used for body composition and cardiac support.',
-    mechanism: 'Activates GHS-R1a and CD36 cardiac receptors. Produces the highest GH release among GHRPs. Cardiac effects (anti-apoptotic, protective) are GH-independent via CD36.',
-    benefits: ['Strongest GH pulse of all GHRPs', 'Direct cardiac protection via CD36', 'Significant lean mass improvement', 'Fat loss', 'Post-MI cardiac recovery (investigational)', 'GH-independent cytoprotective effects'],
-    dosing: { typical: '100–200 mcg/injection', range: '50–300 mcg', frequency: '2–3x daily fasted', route: ['subcutaneous injection'], cycle: '4–8 weeks (rapid desensitization limits longer use)', notes: 'Desensitizes faster than Ipamorelin — cycle off regularly. Causes more hunger (via ghrelin) than Ipamorelin. Powerful but less forgiving than Ipamorelin.' },
-    sideEffects: 'Significant hunger, water retention, elevated cortisol and prolactin (more than Ipamorelin). Facial flushing.',
+    id: 'selank',
+    name: 'Selank',
+    fullName: 'Selank (TP-7)',
+    aliases: ['TP-7'],
+    category: 'Neuropeptide / Anxiolytic',
+    categoryTag: 'neuro',
+    goals: ['mental_clarity', 'neuroprotection', 'fatigue'],
+    regulatoryStatus: 'Not FDA-approved. Registered in Russia as anxiolytic. Research peptide in US.',
     researchLevel: 'moderate',
-    tags: ['GHRP', 'most potent GH', 'cardiac', 'desensitization risk'],
+    summary: 'Synthetic analogue of tuftsin. Anxiolytic, nootropic, and immunomodulatory peptide with no addictive potential. Acts on multiple neurotransmitter systems.',
+    mechanism: 'Modulates GABA-A receptors (benzodiazepine-like mechanism without dependence). Increases BDNF, serotonin turnover. Inhibits enkephalin degradation. Stabilizes mRNA of IL-6 and IL-2.',
+    benefits: [
+      'Anxiolytic without sedation or dependence',
+      'Nootropic — improved learning, memory, attention',
+      'Mood stabilization',
+      'Immune modulation',
+      'Neuroprotection',
+    ],
+    dosing: {
+      typical: '250–500 mcg intranasal or SC, 1–2x daily',
+      range: '100–1,000 mcg/day',
+      route: ['intranasal', 'subcutaneous injection'],
+      cycle: '2–4 weeks; can be used as needed',
+      notes: 'Intranasal administration is most common and convenient.',
+    },
+    sideEffects: 'Excellent tolerability. Mild sedation at higher doses. No withdrawal or dependence.',
+    keyReferences: ['Semenova TP et al. (2010). Selank anxiolytic effects. Bull Exp Biol Med.'],
   },
 
+  // ─── Semax ────────────────────────────────────────────────────────────────────
   {
-    id: 'mk677',
-    name: 'MK-677',
-    fullName: 'MK-677 (Ibutamoren) — oral GH secretagogue',
-    category: 'growth_hormone',
-    route: ['oral'],
-    goals: ['muscle_mass', 'fat_loss', 'sleep', 'recovery', 'anti_aging', 'longevity'],
-    summary: 'Oral GHS-R1a agonist (ghrelin mimetic). Non-peptide oral compound. Only oral GH secretagogue. Significant GH/IGF-1 elevation with once-daily oral dosing.',
-    mechanism: 'Orally active ghrelin receptor agonist — stimulates pituitary GH release. Elevates IGF-1 significantly. Long half-life (~24h) provides sustained GH elevation vs pulsatile peptide protocols.',
-    benefits: ['Oral — no injections required', 'Significant GH and IGF-1 elevation', 'Muscle mass and fat loss', 'Deep wave sleep enhancement', 'Bone density improvement', 'Skin and hair quality'],
-    dosing: { typical: '10–25 mg/day', range: '10–50 mg/day', frequency: 'Once daily, pre-sleep', route: ['oral'], cycle: '3–6 months, then break', notes: 'Pre-sleep dosing maximizes GH pulse during sleep. Hunger is a significant side effect — time around dinner. Monitor fasting glucose. Not technically a peptide (small molecule) but used in peptide protocols.' },
-    sideEffects: 'Significant hunger (ghrelin effect), water retention, increased fasting glucose, insulin resistance at higher doses, fatigue.',
+    id: 'semax',
+    name: 'Semax',
+    fullName: 'Semax (ACTH 4-10 analogue)',
+    aliases: ['ACTH 4-10 Pro-Gly-Pro'],
+    category: 'Neuropeptide / Cognitive',
+    categoryTag: 'neuro',
+    goals: ['mental_clarity', 'neuroprotection', 'fatigue'],
+    regulatoryStatus: 'Not FDA-approved. Registered drug in Russia. Research peptide in US.',
+    researchLevel: 'moderate',
+    summary: 'Synthetic ACTH 4-10 analogue with potent BDNF-stimulating and neuroprotective properties. Used for cognitive enhancement, stroke recovery, and ADHD-like conditions.',
+    mechanism: 'Upregulates BDNF and NGF expression. Activates melanocortin receptors. Enhances dopaminergic and serotonergic neurotransmission. Anti-oxidative effects in brain tissue.',
+    benefits: [
+      'BDNF upregulation — neuroplasticity, learning, memory',
+      'Cognitive enhancement (attention, processing speed)',
+      'Stroke recovery and neuroprotection',
+      'Anti-anxiety and antidepressant properties',
+      'Energy and motivation enhancement',
+    ],
+    dosing: {
+      typical: '200–600 mcg intranasal, 1–2x daily',
+      range: '100–1,200 mcg/day',
+      route: ['intranasal', 'subcutaneous injection'],
+      cycle: '2–4 weeks on, 1–2 weeks off',
+      notes: 'Intranasal preferred for direct CNS access. Morning dosing recommended (stimulatory).',
+    },
+    sideEffects: 'Generally well-tolerated. Possible mild anxiety at higher doses. No serious adverse effects reported.',
+    keyReferences: ['Akhapkina VI et al. (2001). Semax neuroprotection and cognitive effects. Neurosci Behav Physiol.'],
+  },
+
+  // ─── KPV ──────────────────────────────────────────────────────────────────────
+  {
+    id: 'kpv',
+    name: 'KPV',
+    fullName: 'KPV Tripeptide (Lys-Pro-Val)',
+    aliases: ['α-MSH fragment', 'Lys-Pro-Val'],
+    category: 'Anti-Inflammatory / GI',
+    categoryTag: 'gut',
+    goals: ['gut_health', 'inflammation'],
+    regulatoryStatus: 'Research peptide. Not FDA-approved.',
+    researchLevel: 'moderate',
+    summary: 'C-terminal fragment of alpha-MSH. Potent anti-inflammatory peptide with particular efficacy in gut inflammation. Often stacked with BPC-157 for IBD and leaky gut.',
+    mechanism: 'Binds MC1R and MC3R. Inhibits NF-κB, TNF-α, and IL-1β. Reduces intestinal inflammation and permeability. Direct effect on colonic epithelium.',
+    benefits: [
+      'Reduces intestinal inflammation (IBD, Crohn\'s)',
+      'Improves gut barrier integrity',
+      'Systemic anti-inflammatory',
+      'Potential wound healing properties',
+    ],
+    dosing: {
+      typical: '100–500 mcg oral or SC, once or twice daily',
+      range: '100–500 mcg/dose',
+      route: ['oral', 'subcutaneous injection'],
+      cycle: '4–8 weeks for gut conditions',
+      notes: 'Oral bioavailability present (unlike most peptides). Combine with BPC-157 for synergistic GI healing.',
+    },
+    sideEffects: 'Very limited adverse event data. Appears well-tolerated in available studies.',
+    keyReferences: ['Catania A et al. (2004). Alpha-MSH fragments and inflammation. Peptides.'],
+  },
+
+  // ─── MOTS-c ───────────────────────────────────────────────────────────────────
+  {
+    id: 'motsc',
+    name: 'MOTS-c',
+    fullName: 'Mitochondrial-Derived Peptide MOTS-c',
+    aliases: ['Mitochondrial Open Reading Frame of the 12S rRNA-c'],
+    category: 'Mitochondrial / Metabolic',
+    categoryTag: 'mitochondrial',
+    goals: ['mitochondrial', 'metabolic_health', 'longevity', 'fatigue'],
+    regulatoryStatus: 'Research peptide. Not FDA-approved.',
+    researchLevel: 'emerging',
+    summary: 'Mitochondria-derived peptide encoded in the mitochondrial genome. Regulates insulin sensitivity, mitochondrial biogenesis, and metabolic homeostasis. Declines with age.',
+    mechanism: 'Activates AMPK pathway. Regulates folate cycle and purine biosynthesis. Translocates to nucleus under metabolic stress, regulating nuclear gene expression for metabolic adaptation.',
+    benefits: [
+      'Improved insulin sensitivity',
+      'Mitochondrial biogenesis and function',
+      'Enhanced exercise performance and endurance',
+      'Anti-aging metabolic effects',
+      'Potential in T2DM management',
+    ],
+    dosing: {
+      typical: '5–10 mg/week SC',
+      range: '5–15 mg/week',
+      route: ['subcutaneous injection'],
+      cycle: '4–8 weeks',
+      notes: 'Emerging peptide; limited established human protocols. Best used alongside exercise.',
+    },
+    sideEffects: 'Limited data. Appears well-tolerated in available animal and early human data.',
+    keyReferences: ['Lee C et al. (2015). MOTS-c: a mitochondrial derived peptide regulating muscle and fat metabolism. Cell Metab.'],
+  },
+
+  // ─── SS-31 / Elamipretide ──────────────────────────────────────────────────────
+  {
+    id: 'ss31',
+    name: 'SS-31',
+    fullName: 'Elamipretide (SS-31)',
+    aliases: ['MTP-131', 'Bendavia', 'D-Arg-2\'6\'-Dmt-Lys-Phe-NH2'],
+    category: 'Mitochondrial',
+    categoryTag: 'mitochondrial',
+    goals: ['mitochondrial', 'longevity', 'fatigue', 'recovery'],
+    regulatoryStatus: 'Investigational. Phase III trials completed. Not yet FDA-approved (NDA submitted for Barth syndrome).',
     researchLevel: 'high',
-    tags: ['oral', 'ghrelin mimetic', 'non-injectable', 'IGF-1'],
-  },
-
-  {
-    id: 'ghrp2',
-    name: 'GHRP-2',
-    fullName: 'GHRP-2 (Growth Hormone Releasing Peptide 2)',
-    category: 'growth_hormone',
-    route: ['subcutaneous injection'],
-    goals: ['muscle_mass', 'fat_loss', 'recovery', 'anti_aging'],
-    summary: 'Second-generation GHRP. Potent GH release with moderate cortisol and prolactin elevation. Stronger than GHRP-6 for GH release with less hunger.',
-    mechanism: 'Synthetic agonist of GHS-R1a (ghrelin receptor). Stimulates GH release from pituitary. More potent than GHRP-6 on a mcg-for-mcg basis with less ghrelin-mediated hunger.',
-    benefits: ['Strong GH pulse', 'Better cortisol/prolactin profile than GHRP-6', 'Less hunger than GHRP-6', 'Lean mass and fat loss', 'Synergistic with GHRH analogues'],
-    dosing: { typical: '100–200 mcg/injection', range: '50–300 mcg', frequency: '2–3x daily fasted', route: ['subcutaneous injection'], cycle: '4–8 weeks', notes: 'Combine with Sermorelin or CJC-1295 for synergistic GH pulse. Less hunger than GHRP-6. Better suited for daytime dosing than GHRP-6.' },
-    sideEffects: 'Moderate cortisol and prolactin elevation, water retention, hunger (less than GHRP-6).',
-    researchLevel: 'moderate',
-    tags: ['GHRP', 'second gen', 'GH secretagogue'],
-  },
-
-  {
-    id: 'ghrp6',
-    name: 'GHRP-6',
-    fullName: 'GHRP-6 (Growth Hormone Releasing Peptide 6)',
-    category: 'growth_hormone',
-    route: ['subcutaneous injection'],
-    goals: ['muscle_mass', 'fat_loss', 'recovery', 'gut_health'],
-    summary: 'First-generation GHRP. Potent GH release with strongest appetite stimulation of the GHRPs. Used for GH stimulation and also explored for GI healing (shares mechanism with ghrelin).',
-    mechanism: 'First identified GHS-R1a agonist. Stimulates GH release and strongly activates ghrelin pathway — significant appetite stimulation. Gastroprotective properties similar to BPC-157 via ghrelin mechanism.',
-    benefits: ['Strong GH pulse', 'Significant appetite stimulation (useful in underweight/cachexia)', 'Potential gastroprotective effects', 'Lean mass increase with adequate caloric intake', 'Synergistic with GHRH analogues'],
-    dosing: { typical: '100–200 mcg/injection', range: '50–300 mcg', frequency: '2–3x daily fasted', route: ['subcutaneous injection'], cycle: '4–8 weeks', notes: 'Significant hunger — inject 15 min before meals for clinical use or at bedtime. Less preferred than Ipamorelin/GHRP-2 for most anti-aging protocols due to hunger side effect.' },
-    sideEffects: 'Significant hunger, cortisol and prolactin elevation, water retention, potential desensitization.',
-    researchLevel: 'moderate',
-    tags: ['GHRP', 'first gen', 'appetite', 'hunger'],
-  },
-
-  // ── Longevity / Pineal ───────────────────────────────────────────────────────
-
-  {
-    id: 'epitalon',
-    name: 'Epitalon',
-    fullName: 'Epithalon / Epitalon (Ala-Glu-Asp-Gly)',
-    category: 'longevity',
-    route: ['subcutaneous injection', 'intranasal'],
-    goals: ['longevity', 'anti_aging', 'cellular_health', 'sleep', 'mitochondrial'],
-    summary: 'Tetrapeptide derived from the pineal gland. Activates telomerase — considered the primary longevity peptide. 40+ years of Russian research (Khavinson). Extended lifespan in multiple model organisms.',
-    mechanism: 'Stimulates telomerase activity → telomere lengthening. Regulates circadian rhythm via pineal function. Antioxidant. Modulates cortisol/melatonin. Upregulates p53 tumor suppressor.',
-    benefits: ['Telomere lengthening via telomerase activation', 'Extended healthy lifespan in animal models', 'Normalizes circadian rhythm and melatonin', 'Antioxidant and potential anti-cancer properties', 'Immune modulation', 'Improved sleep quality'],
-    dosing: { typical: '5–10 mg/day for 10–20 day course', range: '5–20 mg/day', frequency: 'Daily during course', route: ['subcutaneous injection', 'intranasal'], cycle: '10–20 day course, 1–2x/year typical', notes: 'Cyclic use preferred — not continuous. Significant longevity data from Russian research. Often used alongside DSIP for sleep/longevity protocol. Best used pre-sleep.' },
-    sideEffects: 'Excellent safety profile over decades of research. Mild injection site reactions.',
-    researchLevel: 'moderate',
-    tags: ['longevity', 'telomerase', 'pineal', 'Khavinson'],
-  },
-
-  {
-    id: 'pinealon',
-    name: 'Pinealon',
-    fullName: 'Pinealon (Glu-Asp-Arg)',
-    category: 'longevity',
-    route: ['subcutaneous injection', 'intranasal'],
-    goals: ['longevity', 'neuroprotection', 'sleep', 'anti_aging', 'cognitive'],
-    summary: 'Tripeptide from pineal gland. Neuroprotective and anti-aging. From the same Khavinson/St. Petersburg research as Epitalon. Used for neurological protection and circadian rhythm regulation.',
-    mechanism: 'Penetrates blood-brain barrier. Activates neuronal telomerase, reduces neuronal apoptosis, modulates melatonin pathway, anti-inflammatory in CNS.',
-    benefits: ['Neuroprotection and neuronal longevity', 'Cognitive support in aging', 'Sleep quality and circadian regulation', 'Anti-aging at CNS level', 'May slow neurodegenerative processes'],
-    dosing: { typical: '5–10 mg/day for 10 day course', range: '5–20 mg/day', frequency: 'Daily during course', route: ['subcutaneous injection', 'intranasal'], cycle: '10-day course, 1–2x per year', notes: 'Often combined with Epitalon as part of a comprehensive longevity protocol. Intranasal provides direct CNS delivery.' },
-    sideEffects: 'Very limited human data outside Russian research. Well-tolerated in studies.',
-    researchLevel: 'low_emerging',
-    tags: ['longevity', 'neuroprotective', 'pineal', 'Khavinson'],
-  },
-
-  {
-    id: 'dsip',
-    name: 'DSIP',
-    fullName: 'DSIP (Delta Sleep-Inducing Peptide)',
-    category: 'sleep',
-    route: ['subcutaneous injection'],
-    goals: ['sleep', 'fatigue', 'longevity', 'anti_aging'],
-    summary: 'Endogenous neuropeptide that induces natural deep (delta) sleep. Anti-stress and longevity-promoting at doses studied. Used for insomnia, sleep architecture improvement, and stress regulation.',
-    mechanism: 'Modulates delta-wave sleep by acting on thalamocortical neurons. Anti-stress via hypothalamic-pituitary-adrenal (HPA) axis modulation. Reduces ACTH and corticosterone.',
-    benefits: ['Induces natural deep sleep', 'Improves sleep architecture (stage 3-4)', 'Reduces insomnia', 'Anti-stress via HPA axis modulation', 'Potential longevity properties', 'Reduces pain in some studies'],
-    dosing: { typical: '250–500 mcg before sleep', range: '100–800 mcg', frequency: 'Pre-sleep, as needed', route: ['subcutaneous injection'], cycle: 'As needed, or 2–4 week courses', notes: 'Inject 30–60 min before sleep. Works best in a dark, quiet environment. Not sedating in the pharmacological sense — enables natural sleep onset.' },
-    sideEffects: 'Generally well-tolerated. Occasional dizziness. Vivid dreams reported.',
-    researchLevel: 'moderate',
-    tags: ['sleep', 'delta wave', 'anti-stress', 'longevity'],
-  },
-
-  // ── Melanocortin ─────────────────────────────────────────────────────────────
-
-  {
-    id: 'melanotan',
-    name: 'Melanotan',
-    fullName: 'Melanotan II (MT-II)',
-    category: 'cosmetic',
-    route: ['subcutaneous injection'],
-    goals: ['sexual_function', 'fat_loss', 'skin_health'],
-    summary: 'Synthetic melanocortin analogue. Produces melanogenesis (tanning without UV), appetite suppression, and sexual arousal. Not FDA approved. Precursor inspiration for PT-141.',
-    mechanism: 'Non-selective melanocortin receptor agonist (MC1R through MC5R). MC1R → melanogenesis (tanning). MC3R/MC4R → appetite suppression and sexual arousal. Stronger and less selective than PT-141.',
-    benefits: ['Promotes skin melanogenesis (tanning)', 'Strong sexual arousal (stronger than PT-141 but less selective)', 'Appetite suppression and fat loss', 'UV protection via melanin'],
-    dosing: { typical: '0.25–0.5 mg as needed', range: '0.1–1 mg', frequency: 'As needed for tanning or sexual function. Loading: 0.25 mg/day for 1–2 weeks', route: ['subcutaneous injection'], cycle: 'Loading then as-needed maintenance', notes: 'Start very low to assess nausea tolerance. Much stronger than PT-141 — non-selective receptor binding creates more side effects. Consider PT-141 for sexual function as cleaner option.' },
-    sideEffects: 'Significant nausea (common), facial flushing, spontaneous erection, darkening of moles/freckles, fatigue. Potential melanoma risk with mole changes — monitor skin.',
-    researchLevel: 'moderate',
-    tags: ['melanocortin', 'tanning', 'sexual', 'not FDA approved'],
-  },
-
-  // ── Antioxidant ──────────────────────────────────────────────────────────────
-
-  {
-    id: 'glutathione',
-    name: 'Glutathione',
-    fullName: 'Glutathione (GSH — gamma-L-glutamyl-L-cysteinylglycine)',
-    category: 'antioxidant',
-    route: ['subcutaneous injection', 'intravenous', 'nebulized', 'oral liposomal'],
-    goals: ['cellular_health', 'longevity', 'mitochondrial', 'immune_health', 'detoxification', 'anti_aging'],
-    summary: 'Master antioxidant tripeptide. Central to cellular redox balance, detoxification, and immune function. Levels decline significantly with age and disease.',
-    mechanism: 'Directly neutralizes reactive oxygen species (ROS), regenerates vitamins C and E, supports Phase II hepatic detoxification, maintains mitochondrial membrane potential, modulates immune signaling via NF-κB.',
-    benefits: ['Master cellular antioxidant', 'Hepatic detoxification support', 'Skin brightening (inhibits melanin synthesis)', 'Immune enhancement', 'Mitochondrial protection', 'Heavy metal chelation support', 'Neurological protection'],
-    dosing: { typical: 'IV: 600–1200 mg/infusion. SQ: 200–600 mg/day. Nasal/nebulized: 100–400 mg/day', range: 'Wide range by indication and route', frequency: 'IV: 1–3x/week. SQ: daily or every other day', route: ['intravenous', 'subcutaneous injection', 'nebulized', 'oral liposomal'], cycle: 'Can be used chronically. IV loading courses of 4–12 sessions common.', notes: 'IV has highest bioavailability. SQ convenient for home use. Oral liposomal is next best. Standard oral poorly absorbed. Combine with NAD+ for comprehensive cellular health protocol.' },
-    sideEffects: 'IV: rare allergic reactions, potential zinc depletion with chronic high-dose use. Generally very well-tolerated. Skin lightening with high IV doses.',
-    researchLevel: 'high',
-    tags: ['antioxidant', 'master antioxidant', 'detox', 'IV', 'SQ'],
+    summary: 'Cardiolipin-targeting mitochondrial peptide. Directly targets the inner mitochondrial membrane, restoring cristae structure and electron transport chain efficiency. Strongest evidence for cardiac and skeletal muscle mitochondrial restoration.',
+    mechanism: 'Binds selectively to cardiolipin on inner mitochondrial membrane. Stabilizes cristae architecture, reduces electron leak, restores ATP synthesis, and reduces mitochondrial ROS.',
+    benefits: [
+      'Mitochondrial function restoration',
+      'Improved cardiac function (heart failure with preserved EF)',
+      'Reduced age-related skeletal muscle dysfunction',
+      'Ischemia-reperfusion protection',
+      'Energy and fatigue improvement',
+    ],
+    dosing: {
+      typical: '0.05–0.25 mg/kg SC or IV (clinical trial dosing)',
+      range: 'Varies by indication',
+      route: ['subcutaneous injection', 'intravenous (clinical trials)'],
+      cycle: 'Ongoing; 28-day trial data for Barth syndrome',
+      notes: 'Highest-evidence mitochondrial peptide. Complex protocol — physician supervision required.',
+    },
+    sideEffects: 'Well-tolerated in trials. Injection site reactions. No serious adverse effects.',
+    keyReferences: ['Szeto HH. (2017). Mitochondria-targeted peptide antioxidants. FASEB J.'],
   },
 
 ];
 
-// ── Helper exports ────────────────────────────────────────────────────────────
+// ─── Helper: get peptide by ID ─────────────────────────────────────────────────
+export const getPeptideById = (id) =>
+  PEPTIDE_KNOWLEDGE_BASE.find(p => p.id === id);
 
-export const OPTIMIZATION_GOALS = [
-  { id: 'recovery',         label: 'Recovery & Healing',         icon: '🔄' },
-  { id: 'sleep',            label: 'Sleep Quality',              icon: '😴' },
-  { id: 'muscle_mass',      label: 'Muscle Mass & Strength',     icon: '💪' },
-  { id: 'fat_loss',         label: 'Weight / Fat Reduction',     icon: '⚖️' },
-  { id: 'visceral_fat',     label: 'Visceral Fat Reduction',     icon: '🎯' },
-  { id: 'longevity',        label: 'Longevity & Anti-Aging',     icon: '⏳' },
-  { id: 'mitochondrial',    label: 'Cellular / Mitochondrial',   icon: '⚡' },
-  { id: 'fertility',        label: 'Fertility & Hormonal',       icon: '🧬' },
-  { id: 'fatigue',          label: 'Physical Fatigue',           icon: '🔋' },
-  { id: 'mental_clarity',   label: 'Mental Clarity & Cognition', icon: '🧠' },
-  { id: 'inflammation',     label: 'Inflammation Reduction',     icon: '🛡️' },
-  { id: 'metabolic_health', label: 'Metabolic Health',           icon: '📊' },
-  { id: 'sexual_function',  label: 'Sexual Health & Function',   icon: '💚' },
-  { id: 'gut_health',       label: 'Gut & GI Health',            icon: '🌿' },
-  { id: 'neuroprotection',  label: 'Neuroprotection',            icon: '🔬' },
-  { id: 'anti_aging',       label: 'Skin & Connective Tissue',   icon: '✨' },
-  { id: 'immune_health',    label: 'Immune Health',              icon: '🛡️' },
-  { id: 'cardiac_health',   label: 'Cardiac Health',             icon: '❤️' },
-  { id: 'cellular_health',  label: 'Cellular Health',            icon: '🔬' },
-  { id: 'cognitive',        label: 'Cognitive Enhancement',      icon: '🧠' },
-];
+// ─── Helper: get peptides by goal ─────────────────────────────────────────────
+export const getPeptidesByGoal = (goalId) =>
+  PEPTIDE_KNOWLEDGE_BASE.filter(p => p.goals.includes(goalId));
 
-// Full knowledge base as formatted string for Claude's system prompt
-export const PEPTIDE_CONTEXT = `
-BIO PRECISION AGING — PEPTIDE FORMULARY (${PEPTIDE_KNOWLEDGE_BASE.length} peptides)
-Route default: Subcutaneous injection unless noted.
+// ─── Helper: get peptides by category ─────────────────────────────────────────
+export const getPeptidesByCategory = (cat) =>
+  PEPTIDE_KNOWLEDGE_BASE.filter(p => p.categoryTag === cat);
 
-${PEPTIDE_KNOWLEDGE_BASE.map(p => `
-── ${p.name} (${p.fullName}) ──
-Category: ${p.category} | Route: ${p.route.join(' / ')}
-Goals: ${p.goals.join(', ')}
-Summary: ${p.summary}
-Mechanism: ${p.mechanism}
-Key benefits: ${p.benefits.join(' | ')}
-Dosing: ${p.dosing.typical} — ${p.dosing.frequency}
-Route: ${p.dosing.route.join(' / ')} | Cycle: ${p.dosing.cycle}
-Protocol notes: ${p.dosing.notes}
-Side effects: ${p.sideEffects}
-Evidence: ${p.researchLevel}
-`).join('\n')}
-`;
-
-export default PEPTIDE_KNOWLEDGE_BASE;
+// ─── Category color map (for UI) ──────────────────────────────────────────────
+export const CATEGORY_COLORS = {
+  healing:        { bg: '#0d3d2e', accent: '#10b981', label: 'Healing' },
+  metabolic:      { bg: '#1a2a0d', accent: '#84cc16', label: 'Metabolic' },
+  gh_axis:        { bg: '#0d1f3d', accent: '#3b82f6', label: 'GH Axis' },
+  sexual:         { bg: '#3d0d2a', accent: '#ec4899', label: 'Sexual Health' },
+  longevity:      { bg: '#2a0d3d', accent: '#a855f7', label: 'Longevity' },
+  neuro:          { bg: '#1a0d3d', accent: '#6366f1', label: 'Neuropeptide' },
+  neuroprotection:{ bg: '#1a0d3d', accent: '#6366f1', label: 'Neuroprotection' },
+  immune:         { bg: '#0d2a3d', accent: '#0ea5e9', label: 'Immune' },
+  mitochondrial:  { bg: '#3d2a0d', accent: '#f59e0b', label: 'Mitochondrial' },
+  anti_aging:     { bg: '#3d1a0d', accent: '#f97316', label: 'Anti-Aging' },
+  fertility:      { bg: '#0d3d1a', accent: '#22c55e', label: 'Fertility' },
+  gut:            { bg: '#0d3d1a', accent: '#16a34a', label: 'GI Health' },
+};
