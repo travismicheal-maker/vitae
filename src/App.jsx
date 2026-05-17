@@ -930,7 +930,9 @@ function Setup({ onDone }) {
             • Upload lab results, imaging, or any medical document<br/>
             • Get AI analysis with flagged values highlighted<br/>
             • Ask health questions with cited clinical guidelines<br/>
-            • Works on mobile and desktop
+            • Works on mobile and desktop<br/>
+            • A complete Peptide Guide with AI Consulting<br/>
+            • Ask questions about the most popular peptides
           </div>
         </div>
         <div className="field">
