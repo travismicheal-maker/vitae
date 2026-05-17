@@ -802,14 +802,25 @@ function ChatContent({msgs, busy, input, setInput, send, QUICK_QS, endRef, isMob
             {/* Library dropdown */}
             {showSrcMenu && (
               <div className="src-menu" onClick={e=>e.stopPropagation()}>
-                <div className="src-menu-item">
+                <div className="src-menu-item" onClick={e=>e.stopPropagation()}>
                   <div className="src-menu-icon">🗂</div>
                   <div className="src-menu-info">
                     <div className="src-menu-title">My Library</div>
                     <div className="src-menu-sub">Upload PDFs or text files. Claude will reference them as primary source material when answering your questions.</div>
-                    <button className="btn btnP btnsm" style={{marginTop:9,fontSize:11.5}}
-                      onClick={()=>libraryFileRef.current?.click()}>
+                    <label className="btn btnP btnsm" style={{marginTop:9,fontSize:11.5,cursor:'pointer',display:'inline-flex',alignItems:'center',gap:5}}
+                      onClick={e=>e.stopPropagation()}>
                       + Add document
+                      <input
+                        type="file"
+                        accept=".pdf,.txt,.md"
+                        style={{display:'none'}}
+                        onChange={e=>{
+                          const f=e.target.files?.[0];
+                          if(f) addToLibrary(f);
+                          e.target.value='';
+                        }}
+                      />
+                    </label>
                     </button>
                     {library.map((doc,i)=>(
                       <div key={i} className="lib-item">
@@ -911,9 +922,15 @@ export default function Vitae() {
   useEffect(()=>{endRef.current?.scrollIntoView({behavior:'smooth'});},[msgs,busy]);
   useEffect(()=>{
     if(!showSrcMenu) return;
-    const close = () => setShowSrcMenu(false);
-    document.addEventListener('click', close);
-    return () => document.removeEventListener('click', close);
+    const close = (e) => {
+      // Only close if click is outside the src-bar area
+      if (!e.target.closest('.src-bar') && !e.target.closest('.src-menu')) {
+        setShowSrcMenu(false);
+      }
+    };
+    // Use mousedown so it fires before click events on children
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
   },[showSrcMenu]);
 
   const toast2=(msg,err=false)=>{setToast({msg,err});setTimeout(()=>setToast(null),3500);};
