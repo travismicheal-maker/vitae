@@ -38,6 +38,7 @@ CLINICAL VOICE — FOLLOW THESE EXACTLY:
 FORMATTING:
 - Use bold text for key terms, diagnoses, drug names, and section labels — never ## headings
 - Use numbered lists for differentials and ordered steps; bullets for findings and recommendations
+- Use **markdown tables** for any comparative data, lab value comparisons, drug comparisons, dosing ranges, or structured multi-column information — format as: | Header | Header | \n |---|---| \n | value | value |
 - No horizontal dividers (--- or ***)
 - End every response with a References section formatted exactly as:
 
@@ -85,8 +86,30 @@ function renderMd(t) {
     refLines.push({ label: m[1].trim().replace(/\*\*/g,''), url: m[2].trim() });
   }
 
+  // ── Pre-process markdown tables → HTML tables (before escaping) ───────────
+  // Detect blocks of lines that look like: | col | col | \n |---|---| \n | val | val |
+  const tableRegex = /(\|.+\|\n)([ \t]*\|[\s\-|:]+\|\n)((?:\|.+\|\n?)*)/gm;
+  t = t.replace(tableRegex, (match, headerRow, sepRow, bodyRows) => {
+    const parseRow = (row) => row.trim().replace(/^\||\|$/g,'').split('|').map(c=>c.trim());
+    const headers = parseRow(headerRow);
+    const rows    = bodyRows.trim().split('\n').filter(Boolean).map(parseRow);
+    const ths = headers.map(h=>`<th>${h.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</th>`).join('');
+    const trs = rows.map(r=>`<tr>${r.map(c=>`<td>${c.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</td>`).join('')}</tr>`).join('');
+    return `\n__TABLE__<table class="md-table"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>__ENDTABLE__\n`;
+  });
+
   let html = t
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    // Restore table HTML (un-escape the pre-processed tables)
+    .replace(/&lt;table class="md-table"&gt;/g,'<table class="md-table">')
+    .replace(/&lt;\/table&gt;/g,'</table>')
+    .replace(/&lt;thead&gt;/g,'<thead>').replace(/&lt;\/thead&gt;/g,'</thead>')
+    .replace(/&lt;tbody&gt;/g,'<tbody>').replace(/&lt;\/tbody&gt;/g,'</tbody>')
+    .replace(/&lt;tr&gt;/g,'<tr>').replace(/&lt;\/tr&gt;/g,'</tr>')
+    .replace(/&lt;th&gt;/g,'<th>').replace(/&lt;\/th&gt;/g,'</th>')
+    .replace(/&lt;td&gt;/g,'<td>').replace(/&lt;\/td&gt;/g,'</td>')
+    .replace(/&lt;strong&gt;/g,'<strong>').replace(/&lt;\/strong&gt;/g,'</strong>')
+    .replace(/__TABLE__|__ENDTABLE__/g,'')
     .replace(/^[\-\*_]{3,}\s*$/gm, '')
     .replace(/^#{1,3}\s+(.+)$/gm, '<div class="md-section">$1</div>')
     .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
@@ -228,6 +251,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx)}
 .md-num{display:flex;gap:9px;margin:5px 0;line-height:1.6}
 .md-num-n{color:var(--mu);flex-shrink:0;font-size:12px;margin-top:3px;min-width:16px;font-weight:500}
 .md-link{color:#1D4ED8;text-decoration:underline;font-size:11.5px;word-break:break-all}
+.md-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border-radius:8px;overflow:hidden;border:1px solid var(--bd)}
+.md-table thead{background:var(--g9)}
+.md-table thead th{color:#fff;font-weight:600;padding:10px 14px;text-align:left;font-size:12px;letter-spacing:.3px;white-space:nowrap}
+.md-table tbody tr{border-bottom:1px solid var(--bd);transition:background .12s}
+.md-table tbody tr:last-child{border-bottom:none}
+.md-table tbody tr:nth-child(even){background:var(--bg)}
+.md-table tbody tr:hover{background:var(--g0)}
+.md-table td{padding:9px 14px;vertical-align:top;line-height:1.55;font-size:13px;color:var(--tx)}
 .md-disc{margin-top:14px;padding:10px 13px;background:#EFF6FF;border-radius:8px;font-size:12px;color:#1E40AF;border:1px solid #BFDBFE;line-height:1.6}
 .grade{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap;margin:0 2px;vertical-align:middle}
 .grade-high{background:#D1FAE5;color:#065F46}
@@ -616,6 +647,8 @@ ${PEPTIDE_CONTEXT.slice(0, 12000)}
 ${libraryText ? `\nCLINICIAN LIBRARY DOCUMENTS:\n${libraryText.slice(0,4000)}` : ''}
 
 FORMATTING:
+- Use **markdown tables** whenever presenting comparative data, dosing options, compound comparisons, side effect profiles, or any structured multi-column information — never use pipe-separated text without a proper header/separator row
+- Table format: | Header | Header | \n |---|---| \n | value | value |
 - Bold key peptide names, doses, and clinical terms
 - Use numbered lists for protocols and differentials
 - Use bullets for benefits and considerations
@@ -758,7 +791,7 @@ I'll now generate your personalized peptide recommendations. Ask me anything abo
                   Complete Assessment →
                 </button>
                 <button className="btn btnO" onClick={()=>{
-                  setMsgs([{role:'assistant',content:`Hello${name?` ${name}`:''} — I'm your Peptide Consultant. Ask me anything about peptide therapeutics: mechanisms, dosing protocols, stacking strategies, or specific optimization goals. I communicate practitioner-to-practitioner with full clinical detail.\n\nWhat would you like to know?`}]);
+                  setMsgs([{role:'assistant',content:`I'm your Peptide Consultant. Ask me anything about peptide therapeutics: mechanisms, dosing protocols, stacking strategies, or specific optimization goals. I communicate as an AI clinical consultant with full clinical detail.\n\nWhat would you like to know?`}]);
                   setStep('chat');
                 }}>
                   Skip — Ask Directly
