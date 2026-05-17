@@ -857,3 +857,19 @@ export const CATEGORY_COLORS = {
   fertility:      { bg: '#0d3d1a', accent: '#22c55e', label: 'Fertility' },
   gut:            { bg: '#0d3d1a', accent: '#16a34a', label: 'GI Health' },
 };
+// Legacy alias so App.jsx import keeps working
+export const OPTIMIZATION_GOALS = PEPTIDE_GOALS_DATA;
+ 
+// Pre-built context string for the AI peptide prompt
+export const PEPTIDE_CONTEXT = PEPTIDE_KNOWLEDGE_BASE.map(p => `
+PEPTIDE: ${p.name} (${p.fullName})
+Category: ${p.category}
+Goals: ${p.goals.join(', ')}
+Summary: ${p.summary}
+Mechanism: ${p.mechanism}
+Benefits: ${p.benefits.join(' | ')}
+Typical Dose: ${p.dosing?.typical || 'See dosing section'}
+Cycle: ${p.dosing?.cycle || 'See dosing section'}
+Side Effects: ${p.sideEffects}
+Research Level: ${p.researchLevel}
+`).join('\n---\n');
