@@ -96,32 +96,104 @@ const PEPTIDES = [
   { id:'ss31', name:'SS-31', fullName:'Elamipretide (SS-31)', categoryTag:'mitochondrial', category:'Mitochondrial', icon:'🔋', tagline:'Cardiolipin-targeting peptide for mitochondrial restoration', regulatoryStatus:'Investigational — Phase III completed, NDA submitted for Barth syndrome', researchLevel:'high', isResearchOnly:true, summary:'Targets cardiolipin on the inner mitochondrial membrane. The highest-evidence mitochondrial peptide. Restores cristae architecture, reduces electron leak, and improves ATP synthesis. Strong evidence for heart failure and skeletal muscle restoration.', mechanism:'Cardiolipin binding on inner mitochondrial membrane · Cristae structure stabilization · Electron transport chain efficiency increase · Mitochondrial ROS reduction · ATP synthesis restoration', benefits:['Mitochondrial function restoration','Cardiac function improvement in HFpEF','Age-related skeletal muscle dysfunction reversal','Ischemia-reperfusion injury protection','Energy and fatigue improvement'], dosing:{ clinical:'0.05-0.25 mg/kg SC or IV (clinical trial dosing)', cycle:'Ongoing; requires physician supervision for dosing and monitoring', routes:['Subcutaneous','Intravenous (clinical trials only)'] }, sideEffects:'Well-tolerated in Phase II/III trials. Injection site reactions are the primary adverse effect.', stacks:['SS-31 + MOTS-c (mitochondrial dual stack for comprehensive mitochondrial support)'], humanEvidence:'Multiple Phase II/III clinical trials completed. NDA submitted to FDA for Barth syndrome indication.', pkHalfLife:'~1 hour', bioavailability:'SC: high; selectively concentrates in mitochondria' },
 ];
 
+// ── Inline formatter: **bold**, *italic* ─────────────────────────────────────
+function renderInline(text, isUser) {
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
+  return parts.map((part, i) => {
+    if (/^\*\*[^*]+\*\*$/.test(part)) return <strong key={i} style={{ fontWeight: 700 }}>{part.slice(2, -2)}</strong>;
+    if (/^\*[^*]+\*$/.test(part))     return <em key={i}>{part.slice(1, -1)}</em>;
+    return part;
+  });
+}
+
+// ── Parse a markdown table block into header + rows ──────────────────────────
+function parseTableLines(lines) {
+  const rows = lines
+    .filter(l => !/^\|[\s\-\|]+\|?\s*$/.test(l.trim())) // drop separator rows (|---|---|)
+    .map(l =>
+      l.trim()
+        .replace(/^\|/, '').replace(/\|$/, '') // strip leading/trailing pipes
+        .split('|')
+        .map(cell => cell.trim())
+    );
+  return { header: rows[0] || [], body: rows.slice(1) };
+}
+
 // ── Compact Markdown Renderer ────────────────────────────────────────────────
 function MsgContent({ text, isUser }) {
-  const color = isUser ? '#fff' : C.textMd;
-  const lines = text.split('\n');
-  const nodes = [];
+  const color   = isUser ? '#fff' : C.textMd;
+  const subColor= isUser ? 'rgba(255,255,255,0.75)' : C.textSm;
+  const lines   = text.split('\n');
+  const nodes   = [];
   let i = 0;
 
   while (i < lines.length) {
     const line = lines[i];
 
-    // Skip pure blank lines — don't turn them into spacer divs
+    // ── Blank line — skip silently ──────────────────────────────────────────
     if (line.trim() === '') { i++; continue; }
 
-    // Heading: ### or ## or #
+    // ── Horizontal rule: --- or ─── ────────────────────────────────────────
+    if (/^[\-─]{3,}\s*$/.test(line.trim())) {
+      nodes.push(<hr key={i} style={{ border: 'none', borderTop: `1px solid ${isUser ? 'rgba(255,255,255,0.2)' : C.border}`, margin: '6px 0' }} />);
+      i++; continue;
+    }
+
+    // ── Heading: ###, ##, # ─────────────────────────────────────────────────
     if (/^#{1,3}\s/.test(line)) {
       const lvl = line.match(/^(#{1,3})/)[1].length;
       const txt = line.replace(/^#{1,3}\s+/, '');
       nodes.push(
-        <div key={i} style={{ fontWeight: 700, fontSize: lvl === 1 ? 15 : 14, color, marginTop: nodes.length ? 10 : 0, marginBottom: 2 }}>
+        <div key={i} style={{ fontWeight: 700, fontSize: lvl === 1 ? 15 : 14, color, marginTop: nodes.length ? 10 : 0, marginBottom: 1 }}>
           {renderInline(txt, isUser)}
         </div>
       );
       i++; continue;
     }
 
-    // Bullet: - or * or •
+    // ── Markdown table: lines starting with | ───────────────────────────────
+    if (/^\|/.test(line.trim())) {
+      const tableLines = [];
+      while (i < lines.length && /^\|/.test(lines[i].trim())) {
+        tableLines.push(lines[i]);
+        i++;
+      }
+      const { header, body } = parseTableLines(tableLines);
+      const thBg    = isUser ? 'rgba(255,255,255,0.15)' : C.greenLt;
+      const thColor = isUser ? '#fff' : C.green1;
+      const bdColor = isUser ? 'rgba(255,255,255,0.12)' : C.border;
+      nodes.push(
+        <div key={`tbl-${i}`} style={{ overflowX: 'auto', margin: '6px 0' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+            {header.length > 0 && (
+              <thead>
+                <tr>
+                  {header.map((h, hi) => (
+                    <th key={hi} style={{ background: thBg, color: thColor, fontWeight: 700, padding: '6px 12px', textAlign: 'left', borderBottom: `2px solid ${bdColor}`, whiteSpace: 'nowrap' }}>
+                      {renderInline(h, isUser)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+            )}
+            <tbody>
+              {body.map((row, ri) => (
+                <tr key={ri} style={{ background: ri % 2 === 0 ? 'transparent' : (isUser ? 'rgba(255,255,255,0.06)' : '#f9fafb') }}>
+                  {row.map((cell, ci) => (
+                    <td key={ci} style={{ padding: '5px 12px', color: ci === 0 ? color : subColor, borderBottom: `1px solid ${bdColor}`, lineHeight: 1.4, verticalAlign: 'top', fontWeight: ci === 0 ? 600 : 400 }}>
+                      {renderInline(cell, isUser)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+      continue;
+    }
+
+    // ── Bullet list: -, *, • ────────────────────────────────────────────────
     if (/^[\-\*•]\s/.test(line.trim())) {
       const bullets = [];
       while (i < lines.length && /^[\-\*•]\s/.test(lines[i].trim())) {
@@ -132,7 +204,7 @@ function MsgContent({ text, isUser }) {
         <ul key={`ul-${i}`} style={{ margin: '4px 0', paddingLeft: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 2 }}>
           {bullets.map((b, bi) => (
             <li key={bi} style={{ display: 'flex', gap: 8, fontSize: 13.5, color, lineHeight: 1.45 }}>
-              <span style={{ color: isUser ? 'rgba(255,255,255,0.7)' : C.green3, flexShrink: 0, marginTop: 1 }}>•</span>
+              <span style={{ color: isUser ? 'rgba(255,255,255,0.6)' : C.green3, flexShrink: 0, marginTop: 1 }}>•</span>
               <span>{renderInline(b, isUser)}</span>
             </li>
           ))}
@@ -141,7 +213,7 @@ function MsgContent({ text, isUser }) {
       continue;
     }
 
-    // Numbered list: 1. 2. etc
+    // ── Numbered list: 1. 2. ───────────────────────────────────────────────
     if (/^\d+\.\s/.test(line.trim())) {
       const items = [];
       while (i < lines.length && /^\d+\.\s/.test(lines[i].trim())) {
@@ -152,7 +224,7 @@ function MsgContent({ text, isUser }) {
         <ol key={`ol-${i}`} style={{ margin: '4px 0', paddingLeft: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 2 }}>
           {items.map((b, bi) => (
             <li key={bi} style={{ display: 'flex', gap: 8, fontSize: 13.5, color, lineHeight: 1.45 }}>
-              <span style={{ color: isUser ? 'rgba(255,255,255,0.7)' : C.green3, flexShrink: 0, fontWeight: 600, minWidth: 16 }}>{bi + 1}.</span>
+              <span style={{ color: isUser ? 'rgba(255,255,255,0.6)' : C.green3, flexShrink: 0, fontWeight: 600, minWidth: 18 }}>{bi + 1}.</span>
               <span>{renderInline(b, isUser)}</span>
             </li>
           ))}
@@ -161,7 +233,7 @@ function MsgContent({ text, isUser }) {
       continue;
     }
 
-    // Regular paragraph line
+    // ── Regular paragraph ───────────────────────────────────────────────────
     nodes.push(
       <p key={i} style={{ margin: '2px 0', fontSize: 13.5, color, lineHeight: 1.55 }}>
         {renderInline(line, isUser)}
@@ -171,16 +243,6 @@ function MsgContent({ text, isUser }) {
   }
 
   return <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>{nodes}</div>;
-}
-
-function renderInline(text, isUser) {
-  // Handle **bold** and *italic*
-  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
-  return parts.map((part, i) => {
-    if (/^\*\*[^*]+\*\*$/.test(part)) return <strong key={i} style={{ fontWeight: 700 }}>{part.slice(2, -2)}</strong>;
-    if (/^\*[^*]+\*$/.test(part))   return <em key={i}>{part.slice(1, -1)}</em>;
-    return part;
-  });
 }
 
 // ── AI Chat Component ────────────────────────────────────────────────────────
