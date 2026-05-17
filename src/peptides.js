@@ -328,17 +328,101 @@ export const PEPTIDE_KNOWLEDGE_BASE = [
   {
     id: 'aod9604',
     name: 'AOD-9604',
-    fullName: 'AOD-9604 (Anti-Obesity Drug 9604)',
+    fullName: 'AOD-9604 / Fragment 176–191 (hGH C-terminal lipolytic fragment)',
     category: 'metabolic',
     route: ['subcutaneous injection'],
-    goals: ['fat_loss', 'visceral_fat', 'metabolic_health'],
-    summary: 'C-terminal fragment of HGH (hGH 176-191). Mimics the fat-metabolizing properties of HGH without affecting IGF-1 or blood glucose. Targeted lipolytic agent.',
-    mechanism: 'Activates beta-3 adrenergic receptors on fat cells to stimulate lipolysis. Inhibits lipogenesis. Does NOT bind GH receptor — thus no IGF-1 effects or glucose interference.',
-    benefits: ['Targeted fat loss — especially abdominal/visceral', 'No effect on blood glucose (safe for diabetics)', 'No IGF-1 elevation', 'Potential cartilage repair benefits', 'Can stack with GH peptides without synergistic glucose effects'],
-    dosing: { typical: '300–500 mcg/day', range: '200–600 mcg/day', frequency: 'Once daily, fasted (morning preferred)', route: ['subcutaneous injection'], cycle: '12–16 weeks', notes: 'Inject fasted for maximum lipolytic effect. Combine with caloric restriction and exercise. Can stack with Ipamorelin/CJC for comprehensive body composition.' },
-    sideEffects: 'Generally very well-tolerated. Mild injection site reaction.',
-    researchLevel: 'moderate',
-    tags: ['fat loss', 'HGH fragment', 'lipolytic', 'no IGF-1 effect'],
+    goals: ['fat_loss', 'visceral_fat', 'metabolic_health', 'recovery', 'anti_aging'],
+
+    summary: 'AOD-9604 is a 16-amino acid synthetic peptide (sequence: YLRIVQCRSVEGSCGF) derived from the C-terminus of human growth hormone (residues 177–191 with an N-terminal tyrosine added for stability). Developed by Monash University / Metabolic Pharmaceuticals in Australia. Studied across 6 human RCTs in ~900 subjects. The pivotal Phase 2b obesity trial failed its primary endpoint in 2007 and FDA approval was not pursued. Now classified as NOT FDA-approved and NOT a legally compoundable drug substance in the US. GRAS designation obtained for food use. Widely available in the gray-market compounding ecosystem. Evidence base is moderate for mechanism, low for clinically meaningful fat loss in humans at doses studied.',
+
+    mechanism: `Dual mechanism — acute and chronic effects operate via distinct pathways:
+ACUTE (β3-AR independent): Directly increases fat oxidation and energy expenditure within minutes of injection. This acute response persists in β3-adrenergic receptor knockout mice, confirming a receptor-independent acute pathway. Mechanism: likely protein kinase C signaling modulating hormone-sensitive lipase and acetyl-CoA carboxylase.
+CHRONIC (β3-AR dependent): Upregulates β3-adrenergic receptor (β3-AR) RNA expression in white and brown adipose tissue — restoring suppressed β3-AR levels in obese adipose tissue to levels comparable with lean tissue. This enhanced receptor expression increases lipolytic sensitivity over time. β3-AR knockout mice do NOT lose weight with chronic AOD9604, confirming β3-AR dependence for long-term fat loss.
+CONFIRMED NEGATIVE FINDINGS (mechanistically important): Does NOT bind the GH receptor (confirmed by competition binding assay, 125I-hGH). Does NOT stimulate IGF-1 (confirmed across all 6 human trials). Does NOT induce insulin resistance or impair glucose tolerance (unlike intact hGH). Does NOT compete with hGH for receptor binding. Inhibits acetyl-CoA carboxylase (antilipogenic). Stimulates hormone-sensitive lipase (lipolytic).`,
+
+    benefits: [
+      'Acute fat oxidation and energy expenditure increase (β3-AR independent)',
+      'Chronic lipolysis enhancement via upregulation of β3-adrenergic receptor expression',
+      'No IGF-1 elevation (confirmed across 6 human trials, ~900 subjects)',
+      'No insulin resistance or glucose intolerance (unlike intact hGH)',
+      'No anti-AOD9604 antibody formation in any subject across all trials',
+      'Safety profile indistinguishable from placebo in human trials',
+      'In ob/ob mice: 28% reduction in epididymal fat mass (250 mcg/kg/day x 14 days)',
+      'In Zucker rats: >50% reduction in body weight gain vs control (oral 500 mcg/kg/day x 19 days)',
+      'Can be stacked with GH secretagogues without synergistic glucose effects',
+      'GRAS (Generally Recognized As Safe) designation obtained',
+      'CARTILAGE/OA: Promotes proteoglycan and collagen production in bovine chondrocytes (in vitro)',
+      'CARTILAGE/OA: Enhances differentiation of adipose mesenchymal stem cells into bone',
+      'CARTILAGE/OA: Intra-articular injection reduces cartilage degeneration vs saline control (rabbit model)',
+      'CARTILAGE/OA: AOD9604 + hyaluronic acid combination superior to either alone — lameness recovery 11 days vs 16 (AOD alone) vs 15 (HA alone) vs 25 (saline)',
+    ],
+
+    intraArticularProtocol: {
+      indication: 'Osteoarthritis — knee and potentially other joints',
+      rationale: 'AOD9604 promotes cartilage repair via proteoglycan/collagen synthesis stimulation without IGF-1 elevation or glucose interference — safer joint profile than intra-articular hGH',
+      dose: '0.25 mg AOD9604 per injection (0.6 mL volume)',
+      doseBasis: 'Molar equivalent of 3 mg hGH (the validated GH dose for OA cartilage studies)',
+      combination: '0.25 mg AOD9604 + 6 mg hyaluronic acid — significantly superior to either alone. HA provides chondrocyte protection and extends AOD9604 joint residence time',
+      frequency: 'Weekly injections x 4–7 weeks',
+      guidance: 'Ultrasound guidance strongly recommended for accurate intra-articular placement',
+      keyFinding: 'Kwon & Park 2015 (n=32 rabbits, collagenase-induced OA model): Combined AOD9604+HA showed significantly better gross morphological scores, histopathological scores (Modified Mankin), and lameness recovery than HA alone, AOD9604 alone, or saline. No significant difference between HA alone and AOD9604 alone.',
+      mechanism: 'Promotes proteoglycan and collagen synthesis in chondrocytes. Enhances mesenchymal stem cell differentiation into bone. Retains partial GH-like cartilage functions without IGF-1 stimulation.',
+      safetyAdvantage: 'Unlike intra-articular hGH: no IGF-1 stimulation, no cartilage hypertrophy risk, no subchondral bone geometry alteration, no systemic glucose effects',
+      citation: 'Kwon DR, Park GY. Effect of Intra-articular Injection of AOD9604 with or without Hyaluronic Acid in Rabbit Osteoarthritis Model. Ann Clin Lab Sci. 2015;45(4):426-432.',
+    },
+
+    clinicalTrials: {
+      human: [
+        { id: 'METAOD001', phase: 'I', design: 'DB-PC dose escalation', n: 15, route: 'IV', dose: '25–400 mcg/kg', duration: 'Single dose', finding: 'Safe and well tolerated. No IGF-1 changes, no glucose changes.' },
+        { id: 'METAOD002', phase: 'IIa', design: 'DB-PC Latin Square', n: 23, route: 'IV', dose: '25–100 mcg/kg', duration: 'Single dose', finding: 'Safe in obese males. No IGF-1 or glucose effects.' },
+        { id: 'METAOD003', phase: 'IIa', design: 'DB-PC Latin Square', n: 17, route: 'Oral', dose: '9–54 mg', duration: 'Single dose', finding: 'Safe orally. Mild GI effects at 54mg. No IGF-1 changes.' },
+        { id: 'METAOD004', phase: 'IIa', design: 'DB-PC', n: 36, route: 'Oral', dose: '9–54 mg/day', duration: '7 days', finding: 'Safe. No OGTT changes, no IGF-1 changes. GI events at 54mg.' },
+        { id: 'METAOD005', phase: 'IIb', design: 'DB-PC multi-center', n: 300, route: 'Oral', dose: '1–30 mg/day', duration: '12 weeks', finding: 'Weight loss: 1mg group showed 0.22 kg/wk vs 0.07 kg/wk placebo (p<0.001). No IGF-1 changes. No OGTT changes. No antibodies detected. Safety profile indistinguishable from placebo.' },
+        { id: 'METAOD006', phase: 'IIb', design: 'DB-PC multi-center', n: 502, route: 'Oral', dose: '0.25–1 mg/day', duration: '24 weeks', finding: 'FAILED primary endpoint. No significant weight loss vs placebo at lower doses. Excellent safety profile. No IGF-1, glucose, or antibody effects.' },
+      ],
+      keyAnimal: [
+        { citation: 'Ng et al., Horm Res 2000', model: 'Zucker fa/fa rats', dose: '500 mcg/kg/day oral', duration: '19 days', finding: '>50% reduction in body weight gain. 23% increase in adipose tissue lipolysis. No effect on insulin sensitivity (unlike intact hGH). Confirms oral bioavailability.' },
+        { citation: 'Heffernan et al., Endocrinology 2001', model: 'ob/ob mice + β3-AR knockout mice', dose: '250 mcg/kg/day IP', duration: '14–28 days', finding: 'ob/ob mice: 28% reduction in epididymal fat, significant brown adipose tissue reduction. β3-AR KO mice: NO chronic weight loss (confirms β3-AR dependence for chronic effects). Acute fat oxidation increase persists in KO mice (confirms β3-AR independent acute mechanism).' },
+      ],
+    },
+
+    dosing: {
+      typical: '300 mcg/day SQ (compounding-era protocol)',
+      range: '250–500 mcg/day SQ injection; oral doses studied up to 30 mg/day (no clear dose response for weight loss)',
+      frequency: 'Once daily, fasted — morning injection preferred for lipolytic effect',
+      route: ['subcutaneous injection'],
+      cycle: '12–16 weeks with caloric restriction and exercise',
+      notes: `IMPORTANT CONTEXT: The typical compounding-era protocol (300 mcg/day SQ) has NOT been validated in human RCTs — human trials used oral administration. The injectable SQ protocol is extrapolated from animal data and clinical experience, not clinical trial data.
+OPTIMAL TIMING: Fasted state (AM or pre-exercise) maximizes lipolytic effect. Avoid carbohydrate intake for 30–60 min post-injection.
+STACKING: Can be combined with Ipamorelin/CJC-1295 for body composition — no synergistic glucose/IGF-1 concerns.
+RECONSTITUTION: Reconstitute with bacteriostatic water. Stable refrigerated. Each vial typically 2–5 mg.
+DOSE NOTE: Human oral trials showed modest weight loss only at 1 mg/day. The 300 mcg SQ compounding dose is a clinical convention, not an evidence-based target.
+REGULATORY NOTE: Not FDA approved. Not legally compoundable in the US as of current guidance. Available in gray-market compounding. Verify legal status in jurisdiction.`,
+    },
+
+    sideEffects: `HUMAN TRIAL DATA (Stier et al., J Endocrinol Metab 2013 — summary of all 6 trials, ~900 subjects):
+— Safety profile indistinguishable from placebo across all dose ranges
+— No drug-related serious adverse events or withdrawals in any of the 6 trials
+— No effect on IGF-1 (confirmed at all time points, all doses, all studies)
+— No glucose intolerance or insulin resistance (OGTT normal throughout)
+— No anti-AOD9604 antibodies detected in any subject
+— At 54 mg oral (highest dose studied): increased GI adverse events (headache, diarrhea, flatulence)
+— At doses ≤30 mg/day: AE profile comparable to placebo
+— 5 SAEs in 12-week trial (skin cancers, 1 breast cancer) — investigator assessed as unrelated to treatment; no dose-response pattern; attributed to high baseline cancer risk in obese Australian cohort
+INJECTABLE (extrapolated/clinical): Mild injection site reaction. No systemic concerns at typical 300 mcg doses.`,
+
+    researchLevel: 'high',
+    researchNote: 'High evidence for SAFETY (6 human RCTs, ~900 subjects). Low-moderate evidence for EFFICACY in humans — modest weight loss in Phase 2b, primary endpoint failed, development discontinued for obesity. Strong animal mechanistic data. Compounding use extrapolated from animal models and lower-dose human oral trials.',
+
+    keyReferences: [
+      { citation: 'Ng FM et al. (2000)', title: 'Metabolic Studies of a Synthetic Lipolytic Domain (AOD9604) of Human Growth Hormone', journal: 'Hormones Research 53:274–278', url: 'https://doi.org/10.1159/000023574' },
+      { citation: 'Heffernan MA et al. (2001)', title: 'The Effects of Human GH and Its Lipolytic Fragment (AOD9604) on Lipid Metabolism Following Chronic Treatment in Obese Mice and β3-AR Knock-Out Mice', journal: 'Endocrinology 142(12):5182–5189', url: 'https://doi.org/10.1210/endo.142.12.8516' },
+      { citation: 'Wittert G et al. (2005)', title: 'AOD9604, an Orally Active Peptide for the Treatment of Obesity: Results of a Phase 2b Study', journal: 'Diabetes 54(Suppl):A440' },
+      { citation: 'Stier H et al. (2013)', title: 'Safety and Tolerability of the Hexadecapeptide AOD9604 in Humans', journal: 'J Endocrinol Metab 3(1-2):7–15', url: 'https://doi.org/10.4021/jem157w' },
+      { citation: 'Kwon DR, Park GY (2015)', title: 'Effect of Intra-articular Injection of AOD9604 with or without Hyaluronic Acid in Rabbit Osteoarthritis Model', journal: 'Ann Clin Lab Sci 45(4):426–432', url: 'https://www.annclinlabsci.org' },
+    ],
+
+    tags: ['fat loss', 'HGH fragment', 'lipolytic', 'no IGF-1', 'no insulin resistance', 'GRAS', 'gray-market US', 'trial failed 2007', '6 human RCTs', 'intra-articular OA', 'cartilage regeneration'],
   },
 
   {
