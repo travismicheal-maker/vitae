@@ -247,10 +247,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx)}
 .md-p:last-child{margin-bottom:0}
 .md-p:empty{display:none}
 .md-section{font-weight:600;font-size:14px;color:var(--tx);margin:10px 0 3px;letter-spacing:-.1px}
-.md-bullet{display:flex;gap:9px;margin:3px 0;line-height:1.55}
+.md-bullet{display:flex;gap:9px;margin:2px 0;line-height:1.5}
 .md-dot{color:var(--g5);flex-shrink:0;margin-top:2px;font-size:15px;line-height:1.4}
-.md-num{display:flex;gap:9px;margin:3px 0;line-height:1.55}
+.md-num{display:flex;gap:9px;margin:2px 0;line-height:1.5}
 .md-num-n{color:var(--mu);flex-shrink:0;font-size:12px;margin-top:3px;min-width:16px;font-weight:500}
+.md-p:has(>.md-bullet){margin:0}
+.md-p:has(>.md-num){margin:0}
 .md-link{color:#1D4ED8;text-decoration:underline;font-size:11.5px;word-break:break-all}
 .md-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border-radius:8px;overflow:hidden;border:1px solid var(--bd)}
 .md-table thead{background:var(--g9)}
