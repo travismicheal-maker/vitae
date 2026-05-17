@@ -1601,7 +1601,7 @@ The user pasted this text:\n\n${text}\n\nReturn the JSON object as instructed.`;
             {page==='home'&&<div className="mob-pad"><HomeContent {...sharedProps} isMobile={true}/></div>}
             {page==='records'&&<div className="mob-pad"><RecordsContent {...sharedProps}/></div>}
             {page==='ai'&&<div className="mob-chat"><ChatContent {...sharedProps} QUICK_QS={QUICK_QS} isMobile={true}/></div>}
-            {page==='peptide'&&<div className="mob-chat"><PeptideConsultant name={name} library={library} isMobile={true}/></div>}
+            {page==='peptide'&&<div className="mob-chat"><PeptideOverview /></div>}
             {page==='profile'&&<div className="mob-pad"><ProfileContent {...sharedProps}/></div>}
           </div>
           <nav className="bnav">
@@ -1668,7 +1668,7 @@ The user pasted this text:\n\n${text}\n\nReturn the JSON object as instructed.`;
           {page==='home'&&<div className="desk-content"><HomeContent {...sharedProps} isMobile={false}/></div>}
           {page==='records'&&<div className="desk-content"><RecordsContent {...sharedProps}/></div>}
           {page==='ai'&&<div className="desk-chat"><ChatContent {...sharedProps} QUICK_QS={QUICK_QS} isMobile={false}/></div>}
-          {page==='peptide'&&<div className="mob-chat"><PeptideOverview /></div>}
+          {page==='peptide'&&<div className="desk-chat"><PeptideOverview /></div>}
           {page==='profile'&&<div className="desk-content"><ProfileContent {...sharedProps}/></div>}
         </main>
       </div>
