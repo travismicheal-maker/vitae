@@ -630,8 +630,10 @@ const PEPTIDE_GOALS = PEPTIDE_GOALS_DATA;
 
 const PEPTIDE_CSS = `
 .p-wrap{display:flex;flex-direction:column;height:100%;min-height:500px}
-.p-msgs{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
-.p-cbot{padding:12px 20px 16px;background:var(--surf);border-top:1px solid var(--bd)}
+.p-msgs{flex:1;overflow-y:auto;padding:20px 32px;display:flex;flex-direction:column;gap:16px;align-items:stretch}
+.p-msgs-inner{max-width:900px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:16px;flex:1}
+.p-cbot{padding:12px 32px 16px;background:var(--surf);border-top:1px solid var(--bd)}
+.p-cbot-inner{max-width:900px;width:100%;margin:0 auto}
 .p-irow{display:flex;gap:8px;align-items:flex-end}
 .qz-card{background:var(--surf);border:1px solid var(--bd);border-radius:var(--rd);padding:20px 24px;max-width:640px}
 .qz-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--g9);margin-bottom:5px}
@@ -735,9 +737,10 @@ I'll now generate your personalized peptide recommendations. Ask me anything abo
       <style>{PEPTIDE_CSS}</style>
       <div className="p-wrap">
         <div className="p-msgs">
-
+          <div className="p-msgs-inner">
           {/* Intro */}
           {step === 'intro' && (
+            <div style={{maxWidth:640,width:'100%',margin:'0 auto'}}>
             <div className="qz-card fu">
               <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:12}}>
                 <div style={{width:40,height:40,borderRadius:10,background:'var(--g1)',display:'flex',alignItems:'center',justifyContent:'center'}}><Dna size={20} color="var(--g9)"/></div>
@@ -762,10 +765,12 @@ I'll now generate your personalized peptide recommendations. Ask me anything abo
                 </button>
               </div>
             </div>
+            </div>
           )}
 
           {/* Questionnaire */}
           {step === 'questionnaire' && (
+            <div style={{maxWidth:640,width:'100%',margin:'0 auto'}}>
             <div className="qz-card fu">
               <div className="qz-title">Optimization Assessment</div>
               <div className="qz-sub">Complete this assessment for personalized peptide recommendations. All fields optional.</div>
@@ -818,6 +823,7 @@ I'll now generate your personalized peptide recommendations. Ask me anything abo
               </div>
               {qData.goals.length===0 && <div style={{fontSize:12,color:'var(--mu)',marginTop:8}}>Select at least one goal to continue.</div>}
             </div>
+            </div>
           )}
 
           {/* Chat */}
@@ -849,11 +855,13 @@ I'll now generate your personalized peptide recommendations. Ask me anything abo
             </div>
           )}
           <div ref={endRef}/>
+          </div>{/* end p-msgs-inner */}
         </div>
 
         {/* Bottom bar */}
         {step==='chat' && (
           <div className="p-cbot">
+            <div className="p-cbot-inner">
             <div className="qrow" style={{marginBottom:8}}>
               {quickQs.map(q=><button key={q} className="p-chip" onClick={()=>sendPeptide(q)}>{q}</button>)}
               <button className="p-chip" style={{color:'var(--mu)',borderStyle:'dashed'}} onClick={()=>setStep('questionnaire')}>
@@ -867,6 +875,7 @@ I'll now generate your personalized peptide recommendations. Ask me anything abo
               <button className="sb" onClick={()=>sendPeptide()} disabled={busy||!input.trim()}><Send size={16}/></button>
             </div>
             <div className="disc">⚕ For clinical decision-support only. Peptide therapy requires clinician supervision.</div>
+            </div>{/* end p-cbot-inner */}
           </div>
         )}
       </div>
@@ -1488,7 +1497,7 @@ The user pasted this text:\n\n${text}\n\nReturn the JSON object as instructed.`;
   const filtered=allRecs.filter(r=>filter==='All'?true:filter==='Labs'?r.type==='lab':filter==='Imaging'?r.type==='imaging':filter==='Notes'?r.type==='note':filter==='Meds'?r.type==='medication':true);
   const flagCount=allRecs.filter(r=>r.flagged).length;
   const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  const NAV=[{id:'home',lbl:'Home',I:Home},{id:'records',lbl:'Records',I:FolderOpen},{id:'ai',lbl:'AI Consultant',I:MessageSquare},{id:'peptide',lbl:'Peptide',I:Dna},{id:'profile',lbl:'Profile',I:User}];
+  const NAV=[{id:'home',lbl:'Home',I:Home},{id:'records',lbl:'Records',I:FolderOpen},{id:'ai',lbl:'AI Consultant',I:MessageSquare},{id:'peptide',lbl:'Peptide Consultant',I:Dna},{id:'profile',lbl:'Profile',I:User}];
 
   const sharedProps = {uploads,setUploads,analyzing,setAnalyzing,filter,setFilter,allRecs,filtered,setPage,setInput,fileRef,toast2,drag,setDrag,msgs,busy,input,send,endRef,name,initials,setName,flagCount,recording,toggleVoice,voiceHint,lastModel,setShowPaste,sources,setSources,library,setLibrary,showSrcMenu,setShowSrcMenu,libraryFileRef,addToLibrary};
 
