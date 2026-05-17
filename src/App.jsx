@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useState, useRef, useEffect } from "react";
-import { Home, FolderOpen, MessageSquare, User, FlaskConical, ScanLine, ClipboardList, Pill, Send, AlertTriangle, CheckCircle2, XCircle, Heart, Upload, Bell, Lock, ExternalLink, ChevronRight, FileText, X, Loader, Mic, MicOff, Brain, Zap, ClipboardPaste, ChevronDown } from "lucide-react";
+import { Home, FolderOpen, MessageSquare, User, FlaskConical, ScanLine, ClipboardList, Pill, Send, AlertTriangle, CheckCircle2, XCircle, Heart, Upload, Bell, Lock, ExternalLink, ChevronRight, FileText, X, Loader, Mic, MicOff, Brain, Zap, ClipboardPaste, ChevronDown, Dna, RotateCcw } from "lucide-react";
 
 const makeChatPrompt = (name, records) => {
   const ctx = records && records.length > 0
@@ -564,6 +564,326 @@ function PasteModal({ onClose, onAnalyze, analyzing }) {
         </div>
       </div>
     </div>
+  );
+}
+
+// ── Peptide System Prompt ─────────────────────────────────────────────────────
+const makePeptidePrompt = (name, questionnaire, libraryText) => {
+  const q = questionnaire;
+  return `You are the world's foremost peptide medicine specialist — combining the expertise of an endocrinologist, sports medicine physician, longevity researcher, and clinical pharmacologist. You consult practitioner-to-practitioner on peptide therapeutics for optimization, longevity, and performance.
+
+You have deep, current knowledge of:
+- Peptide pharmacology: mechanisms, receptor binding, downstream signaling
+- Clinical dosing protocols and evidence-based titration strategies
+- Peptide stacking combinations and synergistic effects
+- Side effect profiles, contraindications, and monitoring parameters
+- The full spectrum from FDA-approved peptides to research compounds
+- Injection technique, reconstitution, storage, and administration
+- Compounding pharmacy considerations and sourcing quality
+
+COMMUNICATION STYLE:
+- Practitioner-to-practitioner — assume clinical literacy
+- Lead with mechanism, then clinical application, then dosing
+- Be specific about dosing — give ranges, titration schedules, and timing
+- Flag safety considerations and monitoring proactively
+- Note evidence quality (RCT vs animal model vs case series vs clinical experience)
+- When stacking, explain synergies and any interaction considerations
+
+GRADE LABELS (use on every key claim):
+[Verified — High] RCTs or FDA-approved data
+[Verified — Moderate] Strong observational or multiple cohort studies
+[Verified — Low] Animal models + clinical extrapolation
+[Speculation] Mechanistic reasoning + practitioner experience
+[Unknown] Insufficient evidence
+
+PATIENT PROFILE:
+${name ? `Name: ${name}` : 'Patient: Anonymous'}
+${q ? `
+Age: ${q.age || 'Not provided'}
+Biological sex: ${q.sex || 'Not provided'}
+Activity level: ${q.activity || 'Not provided'}
+Primary optimization goals: ${(q.goals || []).join(', ')}
+Health history / conditions: ${q.history || 'None provided'}
+Current medications / peptides: ${q.currentMeds || 'None'}
+Experience with peptides: ${q.experience || 'Not provided'}
+Additional context: ${q.notes || 'None'}
+` : 'No questionnaire completed yet — ask the patient to complete the assessment for personalized recommendations.'}
+
+${libraryText ? `\nCLINICIAN LIBRARY DOCUMENTS:\n${libraryText.slice(0,6000)}` : ''}
+
+FORMATTING:
+- Bold key peptide names, doses, and clinical terms
+- Use numbered lists for protocols and differentials
+- Use bullets for benefits and considerations
+- Always include a References section with URLs where available
+- No ## headings, no --- dividers
+
+End with: "⚕ For clinical decision-support only. Peptide therapy should be supervised by a qualified clinician with appropriate monitoring."`;
+};
+
+// ── Peptide Consultant Component ──────────────────────────────────────────────
+const PEPTIDE_GOALS = [
+  { id:'recovery',        label:'Recovery & Healing',        icon:'🔄' },
+  { id:'sleep',           label:'Sleep Quality',             icon:'😴' },
+  { id:'muscle_mass',     label:'Muscle Mass & Strength',    icon:'💪' },
+  { id:'weight_loss',     label:'Weight Reduction',          icon:'⚖️' },
+  { id:'visceral_fat',    label:'Visceral Fat Reduction',    icon:'🎯' },
+  { id:'longevity',       label:'Longevity & Anti-Aging',    icon:'⏳' },
+  { id:'mitochondrial',   label:'Cellular / Mitochondrial',  icon:'⚡' },
+  { id:'fertility',       label:'Fertility & Hormonal',      icon:'🧬' },
+  { id:'fatigue',         label:'Physical Fatigue',          icon:'🔋' },
+  { id:'mental_clarity',  label:'Mental Clarity & Cognition',icon:'🧠' },
+  { id:'inflammation',    label:'Inflammation Reduction',    icon:'🛡️' },
+  { id:'metabolic_health',label:'Metabolic Health',          icon:'📊' },
+  { id:'sexual_function', label:'Sexual Health',             icon:'💚' },
+  { id:'gut_health',      label:'Gut & GI Health',           icon:'🌿' },
+  { id:'neuroprotection', label:'Neuroprotection',           icon:'🔬' },
+  { id:'anti_aging',      label:'Skin & Connective Tissue',  icon:'✨' },
+];
+
+const PEPTIDE_CSS = `
+.p-wrap{display:flex;flex-direction:column;height:100%;min-height:500px}
+.p-msgs{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.p-cbot{padding:12px 20px 16px;background:var(--surf);border-top:1px solid var(--bd)}
+.p-irow{display:flex;gap:8px;align-items:flex-end}
+.qz-card{background:var(--surf);border:1px solid var(--bd);border-radius:var(--rd);padding:20px 24px;max-width:640px}
+.qz-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--g9);margin-bottom:5px}
+.qz-sub{font-size:13px;color:var(--mu);margin-bottom:18px;line-height:1.5}
+.qz-section{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--mu);margin:16px 0 8px}
+.qz-goals{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:4px}
+.goal-chip{padding:7px 13px;border-radius:20px;font-size:12.5px;cursor:pointer;border:1.5px solid var(--bd);background:var(--surf);color:var(--tx);font-family:'DM Sans',sans-serif;transition:all .15s;display:flex;align-items:center;gap:6px}
+.goal-chip.sel{background:var(--g9);border-color:var(--g9);color:#fff}
+.qz-input{width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:var(--rds);font-size:13.5px;font-family:'DM Sans',sans-serif;color:var(--tx);background:var(--bg);outline:none;transition:border-color .15s;margin-bottom:8px}
+.qz-input:focus{border-color:var(--g5);background:var(--surf)}
+.qz-select{width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:var(--rds);font-size:13.5px;font-family:'DM Sans',sans-serif;color:var(--tx);background:var(--bg);outline:none;margin-bottom:8px;appearance:none;cursor:pointer}
+.qz-textarea{width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:var(--rds);font-size:13.5px;font-family:'DM Sans',sans-serif;color:var(--tx);background:var(--bg);outline:none;resize:vertical;min-height:70px;line-height:1.55;margin-bottom:8px}
+.qz-textarea:focus,.qz-input:focus,.qz-select:focus{border-color:var(--g5)}
+.qz-btns{display:flex;gap:8px;margin-top:14px}
+.p-chip{padding:5px 13px;background:var(--bg);border:1px solid var(--bd);border-radius:20px;font-size:12px;color:var(--g9);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0}
+.p-chip:hover{background:var(--g1)}
+`;
+
+function PeptideConsultant({ name, library, isMobile }) {
+  const [step,    setStep]    = useState('intro');   // intro | questionnaire | chat
+  const [qData,   setQData]   = useState({ goals:[], age:'', sex:'', activity:'', history:'', currentMeds:'', experience:'', notes:'' });
+  const [msgs,    setMsgs]    = useState([]);
+  const [input,   setInput]   = useState('');
+  const [busy,    setBusy]    = useState(false);
+  const [votes,   setVotes]   = useState({});
+  const [copiedIdx, setCopied] = useState(null);
+  const endRef = useRef(null);
+
+  useEffect(()=>{ endRef.current?.scrollIntoView({behavior:'smooth'}); }, [msgs, busy]);
+
+  const toggleGoal = (id) => setQData(d => ({
+    ...d,
+    goals: d.goals.includes(id) ? d.goals.filter(g=>g!==id) : [...d.goals, id],
+  }));
+
+  const startConsult = () => {
+    const intro = `I've completed your peptide optimization assessment. Based on your profile:
+
+**Patient:** ${name || 'Anonymous'}
+**Age:** ${qData.age || 'Not provided'} | **Sex:** ${qData.sex || 'Not provided'} | **Activity:** ${qData.activity || 'Not provided'}
+**Primary goals:** ${qData.goals.map(g => PEPTIDE_GOALS.find(p=>p.id===g)?.label || g).join(', ')}
+**Health history:** ${qData.history || 'None noted'}
+**Current medications/peptides:** ${qData.currentMeds || 'None'}
+**Peptide experience:** ${qData.experience || 'Not specified'}
+
+I'll now generate your personalized peptide recommendations. Ask me anything about specific peptides, dosing protocols, stacking strategies, or mechanisms.`;
+
+    setMsgs([{ role:'assistant', content: intro }]);
+    setStep('chat');
+
+    // Auto-trigger initial recommendation
+    setTimeout(() => sendPeptide(`Based on my profile above, provide personalized peptide recommendations with specific dosing protocols for my primary goals: ${qData.goals.map(g => PEPTIDE_GOALS.find(p=>p.id===g)?.label || g).join(', ')}`), 300);
+  };
+
+  const sendPeptide = async (text) => {
+    const m = (text || input).trim();
+    if (!m || busy) return;
+    const h = [...msgs, { role:'user', content:m }];
+    setMsgs(h);
+    setInput('');
+    setBusy(true);
+    try {
+      const libText = library?.map(d=>`[Library: ${d.name}]\n${d.text||''}`).join('\n\n') || null;
+      const r = await fetch('/api/chat', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          model:'claude-sonnet-4-6',
+          max_tokens:3000,
+          system: makePeptidePrompt(name, qData.goals.length ? qData : null, libText),
+          messages: h,
+          _sources: { clinicalWeb: true, literature: true },
+        }),
+      });
+      const d = await r.json();
+      const reply = d.mergedText || d.content?.[0]?.text || 'Error — try again.';
+      setMsgs(p => [...p, { role:'assistant', content: reply }]);
+    } catch {
+      setMsgs(p => [...p, { role:'assistant', content:'⚠ Connection error. Please try again.' }]);
+    } finally { setBusy(false); }
+  };
+
+  const quickQs = [
+    'What are the best peptides for my goals?',
+    'How do I stack these peptides?',
+    'Explain the dosing protocol in detail',
+    'What monitoring do I need?',
+    'What are the contraindications?',
+    'Compare CJC-1295 vs Ipamorelin',
+  ];
+
+  const copyText = async (i, content) => {
+    const plain = content.replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
+    try { await navigator.clipboard.writeText(plain); } catch {}
+    setCopied(i);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  return (
+    <>
+      <style>{PEPTIDE_CSS}</style>
+      <div className="p-wrap">
+        <div className="p-msgs">
+
+          {/* Intro */}
+          {step === 'intro' && (
+            <div className="qz-card fu">
+              <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:12}}>
+                <div style={{width:40,height:40,borderRadius:10,background:'var(--g1)',display:'flex',alignItems:'center',justifyContent:'center'}}><Dna size={20} color="var(--g9)"/></div>
+                <div>
+                  <div className="qz-title">Peptide Consultant</div>
+                  <div style={{fontSize:12,color:'var(--mu)'}}>Powered by Bio Precision Aging</div>
+                </div>
+              </div>
+              <div className="qz-sub">
+                I'm a specialized AI consultant for peptide therapeutics — providing evidence-graded information on mechanisms, clinical applications, and dosing protocols for optimization, longevity, and performance.<br/><br/>
+                Complete a brief assessment to receive personalized recommendations, or ask a direct question below.
+              </div>
+              <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                <button className="btn btnP" onClick={()=>setStep('questionnaire')}>
+                  Complete Assessment →
+                </button>
+                <button className="btn btnO" onClick={()=>{
+                  setMsgs([{role:'assistant',content:`Hello${name?` ${name}`:''} — I'm your Peptide Consultant. Ask me anything about peptide therapeutics: mechanisms, dosing protocols, stacking strategies, or specific optimization goals. I communicate practitioner-to-practitioner with full clinical detail.\n\nWhat would you like to know?`}]);
+                  setStep('chat');
+                }}>
+                  Skip — Ask Directly
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Questionnaire */}
+          {step === 'questionnaire' && (
+            <div className="qz-card fu">
+              <div className="qz-title">Optimization Assessment</div>
+              <div className="qz-sub">Complete this assessment for personalized peptide recommendations. All fields optional.</div>
+
+              <div className="qz-section">Step 1 — Select your optimization goals (select all that apply)</div>
+              <div className="qz-goals">
+                {PEPTIDE_GOALS.map(g => (
+                  <button key={g.id} className={`goal-chip ${qData.goals.includes(g.id)?'sel':''}`} onClick={()=>toggleGoal(g.id)}>
+                    {g.icon} {g.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="qz-section">Step 2 — Basic information</div>
+              <input className="qz-input" placeholder="Age" type="number" value={qData.age} onChange={e=>setQData(d=>({...d,age:e.target.value}))}/>
+              <select className="qz-select" value={qData.sex} onChange={e=>setQData(d=>({...d,sex:e.target.value}))}>
+                <option value="">Biological sex (select)</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other/Prefer not to say">Other / Prefer not to say</option>
+              </select>
+              <select className="qz-select" value={qData.activity} onChange={e=>setQData(d=>({...d,activity:e.target.value}))}>
+                <option value="">Activity level (select)</option>
+                <option value="Sedentary">Sedentary (desk job, minimal exercise)</option>
+                <option value="Lightly active">Lightly active (1–3x/week)</option>
+                <option value="Moderately active">Moderately active (3–5x/week)</option>
+                <option value="Highly active">Highly active (6–7x/week)</option>
+                <option value="Athlete/competitive">Athlete / Competitive</option>
+              </select>
+
+              <div className="qz-section">Step 3 — Health history & medications</div>
+              <textarea className="qz-textarea" placeholder="Relevant health conditions, diagnoses, or concerns (e.g. hypothyroidism, insulin resistance, history of cancer...)" value={qData.history} onChange={e=>setQData(d=>({...d,history:e.target.value}))}/>
+              <textarea className="qz-textarea" placeholder="Current medications, hormones, or peptides (e.g. testosterone, metformin, BPC-157...)" value={qData.currentMeds} onChange={e=>setQData(d=>({...d,currentMeds:e.target.value}))}/>
+              <select className="qz-select" value={qData.experience} onChange={e=>setQData(d=>({...d,experience:e.target.value}))}>
+                <option value="">Experience with peptides (select)</option>
+                <option value="None — new to peptides">None — new to peptides</option>
+                <option value="Some experience (1–5 peptides)">Some experience (1–5 peptides)</option>
+                <option value="Experienced (multiple protocols)">Experienced (multiple protocols)</option>
+                <option value="Advanced (stacking, years of use)">Advanced (stacking, years of use)</option>
+              </select>
+              <textarea className="qz-textarea" placeholder="Anything else to know? Specific questions, failed approaches, preferences..." value={qData.notes} onChange={e=>setQData(d=>({...d,notes:e.target.value}))}/>
+
+              <div className="qz-btns">
+                <button className="btn btnP" onClick={startConsult} disabled={qData.goals.length===0}>
+                  Generate Recommendations →
+                </button>
+                <button className="btn btnO" onClick={()=>setStep('intro')}>
+                  Back
+                </button>
+              </div>
+              {qData.goals.length===0 && <div style={{fontSize:12,color:'var(--mu)',marginTop:8}}>Select at least one goal to continue.</div>}
+            </div>
+          )}
+
+          {/* Chat */}
+          {step === 'chat' && msgs.map((m,i) => (
+            <div key={i} className={`${isMobile?'msg':'desk-msg'} ${m.role==='user'?'u':'a'} fu`}>
+              <div className="mrole" style={{display:'flex',alignItems:'center',gap:6}}>
+                {m.role==='user'?'You':'Peptide Consultant'}
+                {m.role==='assistant'&&<span className="model-badge" style={{background:'#EDE9FE',color:'#5B21B6',fontSize:9,padding:'2px 7px',borderRadius:20,fontWeight:600,display:'inline-flex',alignItems:'center',gap:3}}><Dna size={8}/>Bio Precision AI</span>}
+              </div>
+              {m.role==='user'
+                ? <div className="mb">{m.content}</div>
+                : <>
+                    <div className="mb" dangerouslySetInnerHTML={{__html:renderMd(m.content)}}/>
+                    <div className="action-bar">
+                      <button className={`act-btn ${votes[i]==='up'?'voted':''}`} onClick={()=>setVotes(v=>({...v,[i]:v[i]==='up'?null:'up'}))}>👍{votes[i]==='up'?' Helpful':''}</button>
+                      <button className={`act-btn ${votes[i]==='down'?'voted':''}`} onClick={()=>setVotes(v=>({...v,[i]:v[i]==='down'?null:'down'}))}>👎{votes[i]==='down'?' Not helpful':''}</button>
+                      <div className="act-sep"/>
+                      <button className="act-btn" onClick={()=>copyText(i,m.content)}>{copiedIdx===i?'✓ Copied':'📋 Copy'}</button>
+                      <button className="act-btn" onClick={()=>generatePDF(m.content, msgs.filter(x=>x.role==='user')[Math.floor(i/2)]?.content||'Peptide consultation')}>📄 PDF</button>
+                    </div>
+                  </>
+              }
+            </div>
+          ))}
+          {busy && step==='chat' && (
+            <div className={`${isMobile?'msg':'desk-msg'} a fu`}>
+              <div className="mrole" style={{display:'flex',alignItems:'center',gap:6}}>Peptide Consultant <span className="model-badge badge-opus"><Brain size={9}/>Analyzing…</span></div>
+              <div className="dots"><div className="dot"/><div className="dot"/><div className="dot"/></div>
+            </div>
+          )}
+          <div ref={endRef}/>
+        </div>
+
+        {/* Bottom bar */}
+        {step==='chat' && (
+          <div className="p-cbot">
+            <div className="qrow" style={{marginBottom:8}}>
+              {quickQs.map(q=><button key={q} className="p-chip" onClick={()=>sendPeptide(q)}>{q}</button>)}
+              <button className="p-chip" style={{color:'var(--mu)',borderStyle:'dashed'}} onClick={()=>setStep('questionnaire')}>
+                <RotateCcw size={11} style={{display:'inline',marginRight:4}}/>Redo assessment
+              </button>
+            </div>
+            <div className="p-irow">
+              <textarea className="ci" value={input} onChange={e=>setInput(e.target.value)}
+                onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendPeptide();}}}
+                placeholder="Ask about peptides, dosing, stacking, mechanisms…" rows={1}/>
+              <button className="sb" onClick={()=>sendPeptide()} disabled={busy||!input.trim()}><Send size={16}/></button>
+            </div>
+            <div className="disc">⚕ For clinical decision-support only. Peptide therapy requires clinician supervision.</div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -1181,7 +1501,7 @@ The user pasted this text:\n\n${text}\n\nReturn the JSON object as instructed.`;
   const filtered=allRecs.filter(r=>filter==='All'?true:filter==='Labs'?r.type==='lab':filter==='Imaging'?r.type==='imaging':filter==='Notes'?r.type==='note':filter==='Meds'?r.type==='medication':true);
   const flagCount=allRecs.filter(r=>r.flagged).length;
   const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  const NAV=[{id:'home',lbl:'Home',I:Home},{id:'records',lbl:'Records',I:FolderOpen},{id:'ai',lbl:'AI Consultant',I:MessageSquare},{id:'profile',lbl:'Profile',I:User}];
+  const NAV=[{id:'home',lbl:'Home',I:Home},{id:'records',lbl:'Records',I:FolderOpen},{id:'ai',lbl:'AI Consultant',I:MessageSquare},{id:'peptide',lbl:'Peptide',I:Dna},{id:'profile',lbl:'Profile',I:User}];
 
   const sharedProps = {uploads,setUploads,analyzing,setAnalyzing,filter,setFilter,allRecs,filtered,setPage,setInput,fileRef,toast2,drag,setDrag,msgs,busy,input,send,endRef,name,initials,setName,flagCount,recording,toggleVoice,voiceHint,lastModel,setShowPaste,sources,setSources,library,setLibrary,showSrcMenu,setShowSrcMenu,libraryFileRef,addToLibrary};
 
@@ -1215,8 +1535,8 @@ The user pasted this text:\n\n${text}\n\nReturn the JSON object as instructed.`;
           <div className="mob-hd">
             {page==='home'
               ?<div className="logo"><Heart size={15} fill="#52B788" color="#52B788"/>Vitae<span style={{fontSize:11,fontWeight:400,color:'var(--mu)',borderLeft:'1px solid var(--bd)',paddingLeft:8,marginLeft:2}}><a href="https://www.bioprecisionaging.com" target="_blank" rel="noopener noreferrer" style={{color:'var(--mu)',textDecoration:'none'}}>Bio Precision Aging</a></span></div>
-              :<div><div className="ptitle">{{records:'My Records',ai:'AI Consultant',profile:'Profile'}[page]}</div>
-              <div className="psub">{{records:'Labs, imaging & notes',ai:uploads.length>0?`Seeing ${uploads.length} record${uploads.length!==1?'s':''}` :'Upload records for full context',profile:name}[page]}</div></div>}
+              :<div><div className="ptitle">{{records:'My Records',ai:'AI Consultant',peptide:'Peptide Consultant',profile:'Profile'}[page]}</div>
+              <div className="psub">{{records:'Labs, imaging & notes',ai:uploads.length>0?`Seeing ${uploads.length} record${uploads.length!==1?'s':''}` :'Upload records for full context',peptide:'Bio Precision Peptide AI',profile:name}[page]}</div></div>}
             <div style={{display:'flex',gap:7,alignItems:'center'}}>
               {page==='records'&&<button className="btn btnP btnsm" onClick={()=>!analyzing&&fileRef.current?.click()} disabled={analyzing}>
                 {analyzing?<span className="spin"><Loader size={12}/></span>:<Upload size={12}/>}{analyzing?'Analyzing…':'Upload'}
@@ -1228,6 +1548,7 @@ The user pasted this text:\n\n${text}\n\nReturn the JSON object as instructed.`;
             {page==='home'&&<div className="mob-pad"><HomeContent {...sharedProps} isMobile={true}/></div>}
             {page==='records'&&<div className="mob-pad"><RecordsContent {...sharedProps}/></div>}
             {page==='ai'&&<div className="mob-chat"><ChatContent {...sharedProps} QUICK_QS={QUICK_QS} isMobile={true}/></div>}
+            {page==='peptide'&&<div className="mob-chat"><PeptideConsultant name={name} library={library} isMobile={true}/></div>}
             {page==='profile'&&<div className="mob-pad"><ProfileContent {...sharedProps}/></div>}
           </div>
           <nav className="bnav">
@@ -1278,10 +1599,10 @@ The user pasted this text:\n\n${text}\n\nReturn the JSON object as instructed.`;
           <div className="desk-topbar">
             <div>
               <div className="desk-page-title">
-                {page==='home'?`Good morning, ${name.split(' ')[0]}`:{records:'My Records',ai:'AI Consultant',profile:'Profile'}[page]}
+                {page==='home'?`Good morning, ${name.split(' ')[0]}`:{records:'My Records',ai:'AI Consultant',peptide:'Peptide Consultant',profile:'Profile'}[page]}
               </div>
               <div className="desk-page-sub">
-                {{home:'Your health records at a glance',records:'Labs, imaging & notes',ai:uploads.length>0?`Seeing ${uploads.length} uploaded record${uploads.length!==1?'s':''}` :'Upload records so AI can reference them',profile:'Your session'}[page]}
+                {{home:'Your health records at a glance',records:'Labs, imaging & notes',peptide:'Personalized peptide recommendations',ai:uploads.length>0?`Seeing ${uploads.length} uploaded record${uploads.length!==1?'s':''}` :'Upload records so AI can reference them',profile:'Your session'}[page]}
               </div>
             </div>
             {page==='records'&&(
@@ -1294,6 +1615,7 @@ The user pasted this text:\n\n${text}\n\nReturn the JSON object as instructed.`;
           {page==='home'&&<div className="desk-content"><HomeContent {...sharedProps} isMobile={false}/></div>}
           {page==='records'&&<div className="desk-content"><RecordsContent {...sharedProps}/></div>}
           {page==='ai'&&<div className="desk-chat"><ChatContent {...sharedProps} QUICK_QS={QUICK_QS} isMobile={false}/></div>}
+          {page==='peptide'&&<div className="desk-chat"><PeptideConsultant name={name} library={library} isMobile={false}/></div>}
           {page==='profile'&&<div className="desk-content"><ProfileContent {...sharedProps}/></div>}
         </main>
       </div>
