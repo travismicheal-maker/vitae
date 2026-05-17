@@ -96,6 +96,93 @@ const PEPTIDES = [
   { id:'ss31', name:'SS-31', fullName:'Elamipretide (SS-31)', categoryTag:'mitochondrial', category:'Mitochondrial', icon:'🔋', tagline:'Cardiolipin-targeting peptide for mitochondrial restoration', regulatoryStatus:'Investigational — Phase III completed, NDA submitted for Barth syndrome', researchLevel:'high', isResearchOnly:true, summary:'Targets cardiolipin on the inner mitochondrial membrane. The highest-evidence mitochondrial peptide. Restores cristae architecture, reduces electron leak, and improves ATP synthesis. Strong evidence for heart failure and skeletal muscle restoration.', mechanism:'Cardiolipin binding on inner mitochondrial membrane · Cristae structure stabilization · Electron transport chain efficiency increase · Mitochondrial ROS reduction · ATP synthesis restoration', benefits:['Mitochondrial function restoration','Cardiac function improvement in HFpEF','Age-related skeletal muscle dysfunction reversal','Ischemia-reperfusion injury protection','Energy and fatigue improvement'], dosing:{ clinical:'0.05-0.25 mg/kg SC or IV (clinical trial dosing)', cycle:'Ongoing; requires physician supervision for dosing and monitoring', routes:['Subcutaneous','Intravenous (clinical trials only)'] }, sideEffects:'Well-tolerated in Phase II/III trials. Injection site reactions are the primary adverse effect.', stacks:['SS-31 + MOTS-c (mitochondrial dual stack for comprehensive mitochondrial support)'], humanEvidence:'Multiple Phase II/III clinical trials completed. NDA submitted to FDA for Barth syndrome indication.', pkHalfLife:'~1 hour', bioavailability:'SC: high; selectively concentrates in mitochondria' },
 ];
 
+// ── Compact Markdown Renderer ────────────────────────────────────────────────
+function MsgContent({ text, isUser }) {
+  const color = isUser ? '#fff' : C.textMd;
+  const lines = text.split('\n');
+  const nodes = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Skip pure blank lines — don't turn them into spacer divs
+    if (line.trim() === '') { i++; continue; }
+
+    // Heading: ### or ## or #
+    if (/^#{1,3}\s/.test(line)) {
+      const lvl = line.match(/^(#{1,3})/)[1].length;
+      const txt = line.replace(/^#{1,3}\s+/, '');
+      nodes.push(
+        <div key={i} style={{ fontWeight: 700, fontSize: lvl === 1 ? 15 : 14, color, marginTop: nodes.length ? 10 : 0, marginBottom: 2 }}>
+          {renderInline(txt, isUser)}
+        </div>
+      );
+      i++; continue;
+    }
+
+    // Bullet: - or * or •
+    if (/^[\-\*•]\s/.test(line.trim())) {
+      const bullets = [];
+      while (i < lines.length && /^[\-\*•]\s/.test(lines[i].trim())) {
+        bullets.push(lines[i].trim().replace(/^[\-\*•]\s+/, ''));
+        i++;
+      }
+      nodes.push(
+        <ul key={`ul-${i}`} style={{ margin: '4px 0', paddingLeft: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {bullets.map((b, bi) => (
+            <li key={bi} style={{ display: 'flex', gap: 8, fontSize: 13.5, color, lineHeight: 1.45 }}>
+              <span style={{ color: isUser ? 'rgba(255,255,255,0.7)' : C.green3, flexShrink: 0, marginTop: 1 }}>•</span>
+              <span>{renderInline(b, isUser)}</span>
+            </li>
+          ))}
+        </ul>
+      );
+      continue;
+    }
+
+    // Numbered list: 1. 2. etc
+    if (/^\d+\.\s/.test(line.trim())) {
+      const items = [];
+      while (i < lines.length && /^\d+\.\s/.test(lines[i].trim())) {
+        items.push(lines[i].trim().replace(/^\d+\.\s+/, ''));
+        i++;
+      }
+      nodes.push(
+        <ol key={`ol-${i}`} style={{ margin: '4px 0', paddingLeft: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {items.map((b, bi) => (
+            <li key={bi} style={{ display: 'flex', gap: 8, fontSize: 13.5, color, lineHeight: 1.45 }}>
+              <span style={{ color: isUser ? 'rgba(255,255,255,0.7)' : C.green3, flexShrink: 0, fontWeight: 600, minWidth: 16 }}>{bi + 1}.</span>
+              <span>{renderInline(b, isUser)}</span>
+            </li>
+          ))}
+        </ol>
+      );
+      continue;
+    }
+
+    // Regular paragraph line
+    nodes.push(
+      <p key={i} style={{ margin: '2px 0', fontSize: 13.5, color, lineHeight: 1.55 }}>
+        {renderInline(line, isUser)}
+      </p>
+    );
+    i++;
+  }
+
+  return <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>{nodes}</div>;
+}
+
+function renderInline(text, isUser) {
+  // Handle **bold** and *italic*
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
+  return parts.map((part, i) => {
+    if (/^\*\*[^*]+\*\*$/.test(part)) return <strong key={i} style={{ fontWeight: 700 }}>{part.slice(2, -2)}</strong>;
+    if (/^\*[^*]+\*$/.test(part))   return <em key={i}>{part.slice(1, -1)}</em>;
+    return part;
+  });
+}
+
 // ── AI Chat Component ────────────────────────────────────────────────────────
 function PeptideAIChat({ onBack }) {
   const [msgs, setMsgs]   = useState([{ role: 'assistant', content: 'Hello! I am your Peptide AI Consultant. Ask me anything about peptide therapy — mechanisms, dosing protocols, stacking strategies, safety considerations, or which peptides may support your goals. How can I help you today?' }]);
@@ -164,21 +251,22 @@ RULES:
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 720, width: '100%', margin: '0 auto' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 720, width: '100%', margin: '0 auto' }}>
         {msgs.map((m, i) => (
           <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
             <div style={{
-              maxWidth: '80%', padding: '12px 16px', borderRadius: 14,
+              maxWidth: '82%', padding: '10px 14px', borderRadius: 14,
               background: m.role === 'user' ? C.green2 : C.card,
               color: m.role === 'user' ? '#fff' : C.text,
               border: m.role === 'user' ? 'none' : `1px solid ${C.border}`,
-              fontSize: 14, lineHeight: 1.65,
-            }}>{m.content}</div>
+            }}>
+              <MsgContent text={m.content} isUser={m.role === 'user'} />
+            </div>
           </div>
         ))}
         {busy && (
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '12px 16px', color: C.textSm, fontSize: 14 }}>Thinking...</div>
+            <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '10px 14px', color: C.textSm, fontSize: 13 }}>Thinking...</div>
           </div>
         )}
         <div ref={endRef} />
