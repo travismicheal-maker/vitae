@@ -919,36 +919,57 @@ I'll now generate your personalized peptide recommendations. Ask me anything abo
 function Setup({ onDone }) {
   const [name, setName] = useState('');
   return (
-    <div className="setup-wrap">
-      <style>{CSS}</style>
-      <div className="setup-card">
-        <div className="s-logo"><Heart size={24} fill="#52B788" color="#52B788"/>Vitae</div>
-        <div className="s-sub">Your personal health AI. Enter your name to get started — no account or API key needed.</div>
-        <div style={{background:'#F0FDF4',border:'1px solid #D1FAE5',borderRadius:'var(--rd)',padding:'14px',marginBottom:24}}>
-          <div style={{fontWeight:600,fontSize:13,color:'#1B4332',marginBottom:6}}>✓ What you can do</div>
-          <div style={{fontSize:13,color:'#2D6A4F',lineHeight:1.7}}>
-            • Upload lab results, imaging, or any medical document<br/>
-            • Get AI analysis with flagged values highlighted<br/>
-            • Ask health questions with cited clinical guidelines<br/>
-            • Works on mobile and desktop<br/>
-            • A complete Peptide Guide with AI Consulting<br/>
-            • Ask questions about the most popular peptides
-          </div>
+    <div style={{padding:'32px 24px',maxWidth:440,margin:'0 auto'}}>
+      <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}>
+        <Heart size={28} style={{color:'var(--g6)'}} fill="currentColor"/>
+        <span style={{fontSize:26,fontWeight:700,color:'var(--g9)',fontFamily:"'Playfair Display',serif"}}>Vitae</span>
+      </div>
+      <p style={{fontSize:15,color:'var(--mu)',marginBottom:24,lineHeight:1.6}}>
+        Your personal health AI. Enter your name to get started — no account or API key needed.
+      </p>
+
+      <div style={{background:'#F0FDF4',border:'1px solid #D1FAE5',borderRadius:'var(--rd)',padding:'14px',marginBottom:24}}>
+        <div style={{fontWeight:600,fontSize:13,color:'#1B4332',marginBottom:6}}>✓ What you can do</div>
+        <div style={{fontSize:13,color:'#2D6A4F',lineHeight:1.7}}>
+          • Upload lab results, imaging, or any medical document<br/>
+          • Get AI analysis with flagged values highlighted<br/>
+          • Ask health questions with cited clinical guidelines<br/>
+          • Works on mobile and desktop<br/>
+          • A complete Peptide Guide with AI Consulting<br/>
+          • Ask questions about the most popular peptides
         </div>
-        <div className="field">
-          <label>Your Name</label>
-          <input value={name} onChange={e=>setName(e.target.value)} placeholder="e.g. Alex Johnson" onKeyDown={e=>e.key==='Enter'&&name.trim()&&onDone(name.trim())}/>
-        </div>
-        <button className="s-btn" onClick={()=>name.trim()&&onDone(name.trim())} disabled={!name.trim()}>Get Started →</button>
-        <p style={{fontSize:11,color:'var(--mu)',marginTop:14,textAlign:'center',lineHeight:1.6}}>Your data stays in your browser session only. Nothing is stored on any server.</p>
-        <div style={{marginTop:20,paddingTop:16,borderTop:'1px solid var(--bd)',textAlign:'center'}}>
-          <p style={{fontSize:11,color:'var(--mu)',letterSpacing:'.3px'}}>Powered by</p>
-          <a href="https://www.bioprecisionaging.com" target="_blank" rel="noopener noreferrer" style={{fontSize:13,fontWeight:600,color:'var(--g9)',marginTop:3,fontFamily:"'Playfair Display',serif",textDecoration:'none',display:'block'}}>Bio Precision Aging</a>
-        </div>
+      </div>
+
+      <div className="field">
+        <label>YOUR NAME</label>
+        <input
+          value={name}
+          onChange={e => setName(e.target.value)}
+          placeholder="e.g. Alex Johnson"
+          onKeyDown={e => e.key === 'Enter' && name.trim() && onDone(name.trim())}
+        />
+      </div>
+
+      <button
+        className="s-btn"
+        onClick={() => name.trim() && onDone(name.trim())}
+        disabled={!name.trim()}
+      >
+        Get Started →
+      </button>
+
+      <p style={{fontSize:11,color:'var(--mu)',marginTop:14,textAlign:'center',lineHeight:1.6}}>
+        Your data stays in your browser session only. Nothing is stored on any server.
+      </p>
+
+      <div style={{marginTop:20,paddingTop:16,borderTop:'1px solid var(--bd)',textAlign:'center'}}>
+        <p style={{fontSize:11,color:'var(--mu)',letterSpacing:'.3px'}}>Powered by</p>
+        <p style={{fontSize:13,fontWeight:600,color:'var(--g9)',marginTop:3,fontFamily:"'Playfair Display',serif"}}>Bio Precision Aging</p>
       </div>
     </div>
   );
 }
+
 
 // ── Shared page content components ────────────────────────────────────────────
 function HomeContent({name, allRecs, flagCount, uploads, setPage, isMobile}) {
