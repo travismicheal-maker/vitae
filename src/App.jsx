@@ -298,7 +298,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx)}
 .dot{width:5px;height:5px;background:var(--mu);border-radius:50%;animation:bl 1.2s infinite}
 .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
 @keyframes bl{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
-.qrow{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;margin-bottom:10px}
+.qrow{display:flex;gap:6px;flex-wrap:wrap;padding-bottom:6px;scrollbar-width:none;margin-bottom:10px}
 .qrow::-webkit-scrollbar{display:none}
 .qc{padding:6px 13px;background:var(--bg);border:1px solid var(--bd);border-radius:20px;font-size:12px;color:var(--g9);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0;transition:all .15s}
 .qc:hover{background:var(--g1)}
