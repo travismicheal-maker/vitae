@@ -1668,7 +1668,7 @@ The user pasted this text:\n\n${text}\n\nReturn the JSON object as instructed.`;
           {page==='home'&&<div className="desk-content"><HomeContent {...sharedProps} isMobile={false}/></div>}
           {page==='records'&&<div className="desk-content"><RecordsContent {...sharedProps}/></div>}
           {page==='ai'&&<div className="desk-chat"><ChatContent {...sharedProps} QUICK_QS={QUICK_QS} isMobile={false}/></div>}
-          {page==='peptide'&&<div className="desk-chat"><PeptideConsultant name={name} library={library} isMobile={false}/></div>}
+          {page==='peptide'&&<div className="mob-chat"><PeptideOverview /></div>}
           {page==='profile'&&<div className="desk-content"><ProfileContent {...sharedProps}/></div>}
         </main>
       </div>
