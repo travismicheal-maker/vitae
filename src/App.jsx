@@ -802,26 +802,27 @@ function ChatContent({msgs, busy, input, setInput, send, QUICK_QS, endRef, isMob
             {/* Library dropdown */}
             {showSrcMenu && (
               <div className="src-menu" onClick={e=>e.stopPropagation()}>
-                <div className="src-menu-item" onClick={e=>e.stopPropagation()}>
+                <div className="src-menu-item">
                   <div className="src-menu-icon">🗂</div>
                   <div className="src-menu-info">
                     <div className="src-menu-title">My Library</div>
                     <div className="src-menu-sub">Upload PDFs or text files. Claude will reference them as primary source material when answering your questions.</div>
-                    <label className="btn btnP btnsm" style={{marginTop:9,fontSize:11.5,cursor:'pointer',display:'inline-flex',alignItems:'center',gap:5}}
-                      onClick={e=>e.stopPropagation()}>
+                    <label
+                      className="btn btnP btnsm"
+                      style={{marginTop:9,fontSize:11.5,cursor:'pointer',display:'inline-flex',alignItems:'center',gap:5}}
+                    >
                       + Add document
                       <input
                         type="file"
                         accept=".pdf,.txt,.md"
-                        style={{display:'none'}}
+                        style={{position:'absolute',opacity:0,width:0,height:0,overflow:'hidden'}}
                         onChange={e=>{
                           const f=e.target.files?.[0];
-                          if(f) addToLibrary(f);
+                          if(f){ addToLibrary(f); }
                           e.target.value='';
                         }}
                       />
                     </label>
-                    </button>
                     {library.map((doc,i)=>(
                       <div key={i} className="lib-item">
                         📄 <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{doc.name}</span>
@@ -831,7 +832,7 @@ function ChatContent({msgs, busy, input, setInput, send, QUICK_QS, endRef, isMob
                       </div>
                     ))}
                     {library.length===0 && (
-                      <div style={{fontSize:12,color:'var(--mu)',marginTop:7,fontStyle:'italic'}}>No documents yet</div>
+                      <div style={{fontSize:12,color:'var(--mu)',marginTop:7,fontStyle:'italic'}}>No documents yet — add one above</div>
                     )}
                   </div>
                 </div>
