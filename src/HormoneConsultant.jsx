@@ -307,7 +307,12 @@ RESPONSE FORMAT REQUIREMENTS
 - Use math/statistics when explaining concepts (ratios, percentages, reference ranges)
 - When responding to men: use male-specific reference ranges, dosing, and monitoring parameters
 - When responding to women: use female-specific reference ranges, dosing, and monitoring parameters
-- End all clinical/treatment questions with: ⚠️ Always work with a qualified hormone specialist for personalized evaluation and treatment.`;
+- End all clinical/treatment questions with: ⚠️ Always work with a qualified hormone specialist for personalized evaluation and treatment.
+- Do NOT use em dashes (—); use a colon or comma instead
+- Use - for bullet points, NOT asterisks (*)
+- Use ## for section headers (they render as styled headers)
+- Use --- on its own line for section breaks (renders as a visual line)
+- Use markdown tables (| Col | Col |\n|---|---|\n| val | val |) for comparative data`;
 
 
 
@@ -366,15 +371,90 @@ function toBase64(file) {
 
 function MessageBubble({ msg }) {
   const isUser = msg.role === "user";
-  const formatContent = (text) => text
+  function formatContent(text) {
+  if (!text) return '';
+  // Normalize line endings, remove em dashes
+  let t = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n')
+              .replace(/ — /g,': ').replace(/—/g,'-');
+
+  // Process tables
+  const tableRegex = /(\|.+\|\n)([ \t]*\|[\s\-|:]+\|\n)((?:\|.+\|\n?)*)/gm;
+  t = t.replace(tableRegex, (match, headerRow, sepRow, bodyRows) => {
+    const parseRow = r => r.trim().replace(/^\||\|$/g,'').split('|').map(c=>c.trim());
+    const headers = parseRow(headerRow);
+    const rows = bodyRows.trim().split('\n').filter(Boolean).map(parseRow);
+    const ths = headers.map(h=>`<th style="padding:8px 12px;text-align:left;background:#1e293b;color:#fff;font-size:12px;font-weight:600">${h}</th>`).join('');
+    const trs = rows.map(r=>`<tr>${r.map((c,i)=>`<td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #e2e8f0;${i===0?'font-weight:600;color:#0f172a':'color:#334155'}">${c}</td>`).join('')}</tr>`).join('');
+    return `<table style="width:100%;border-collapse:collapse;margin:12px 0;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+  });
+  // Strip orphan table separator rows
+  t = t.replace(/^\|[\s\-|:]+\|$/gm,'');
+
+  // Process line by line for block elements
+  const lines = t.split('\n');
+  const out = [];
+  let bulletBuffer = [];
+  const flushBullets = () => {
+    if (bulletBuffer.length) {
+      out.push(`<ul style="margin:6px 0;padding-left:0;list-style:none">${bulletBuffer.join('')}</ul>`);
+      bulletBuffer = [];
+    }
+  };
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    // HR
+    if (/^[ \t]*[\-\*_]{3,}[ \t]*$/.test(line)) {
+      flushBullets();
+      out.push('<div style="height:1px;background:#e2e8f0;margin:14px 0"></div>');
+    // H1-H4
+    } else if (/^#{1,4}\s/.test(line)) {
+      flushBullets();
+      const text = line.replace(/^#{1,4}\s+/, '');
+      const level = line.match(/^(#{1,4})/)[1].length;
+      const sz = level <= 2 ? '15px' : '13px';
+      const wt = level <= 2 ? '700' : '600';
+      out.push(`<div style="font-size:${sz};font-weight:${wt};color:#0f172a;margin:14px 0 6px;padding-bottom:5px;border-bottom:1px solid #e2e8f0">${text}</div>`);
+    // Bullet - or *
+    } else if (/^[\-\*]\s+/.test(line)) {
+      const text = line.replace(/^[\-\*]\s+/, '');
+      bulletBuffer.push(`<li style="display:flex;gap:7px;align-items:flex-start;margin:3px 0;font-size:13px;line-height:1.55;color:#1e293b"><span style="color:#4f46e5;font-weight:700;flex-shrink:0;margin-top:1px">•</span><span>${text}</span></li>`);
+    // Numbered list
+    } else if (/^\d+\.\s+/.test(line)) {
+      flushBullets();
+      const num = line.match(/^(\d+)/)[1];
+      const text = line.replace(/^\d+\.\s+/, '');
+      out.push(`<div style="display:flex;gap:8px;align-items:flex-start;margin:3px 0;font-size:13px;line-height:1.55"><span style="color:#94a3b8;font-weight:600;flex-shrink:0;min-width:18px">${num}.</span><span style="color:#1e293b">${text}</span></div>`);
+    // Table (already processed, pass through)
+    } else if (line.includes('<table')) {
+      flushBullets();
+      out.push(line);
+    // Blank line
+    } else if (line.trim() === '') {
+      flushBullets();
+      out.push('<div style="height:6px"></div>');
+    // Normal paragraph
+    } else {
+      flushBullets();
+      out.push(`<p style="margin:0 0 4px;font-size:14px;line-height:1.55;color:#1e293b">${line}</p>`);
+    }
+  }
+  flushBullets();
+  let html = out.join('\n');
+
+  // Inline: bold, italic, grade badges, disclaimer, bullets char, links
+  html = html
     .replace(/\*\*(.*?)\*\*/g,'<strong style="color:#0f172a;font-weight:700">$1</strong>')
-    .replace(/\*(.*?)\*/g,'<em style="color:#334155">$1</em>')
-    .replace(/\[Verified\]/g,'<span style="display:inline-flex;align-items:center;background:#f0fdf4;color:#15803d;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #bbf7d0;font-family:monospace">✓ Verified</span>')
-    .replace(/\[Emerging Evidence\]/g,'<span style="display:inline-flex;align-items:center;background:#fffbeb;color:#92400e;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #fde68a;font-family:monospace">⚡ Emerging</span>')
-    .replace(/\[Speculation\]/g,'<span style="display:inline-flex;align-items:center;background:#f5f3ff;color:#6d28d9;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #ddd6fe;font-family:monospace">? Speculation</span>')
-    .replace(/⚠️(.*?)(<br\/>|$)/g,'<div style="margin-top:10px;padding:10px 14px;background:#fff7ed;border:1px solid #fed7aa;border-left:3px solid #ea580c;border-radius:6px;color:#9a3412;font-size:13px;line-height:1.5">⚠️$1</div>')
-    .replace(/•/g,'<span style="color:#4f46e5;font-weight:bold;margin-right:3px">•</span>')
-    .replace(/\n\n/g,'<br/><br/>').replace(/\n/g,'<br/>');
+    .replace(/\[Verified\s*[-—]\s*High\]/g,'<span style="display:inline-flex;align-items:center;background:#f0fdf4;color:#15803d;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;border:1px solid #bbf7d0">✓ Verified High</span>')
+    .replace(/\[Verified\s*[-—]\s*Moderate\]/g,'<span style="display:inline-flex;align-items:center;background:#dbeafe;color:#1e40af;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;border:1px solid #bfdbfe">✓ Verified Mod</span>')
+    .replace(/\[Verified\s*[-—]\s*Low\]/g,'<span style="display:inline-flex;align-items:center;background:#fef9c3;color:#854d0e;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;border:1px solid #fde68a">✓ Verified Low</span>')
+    .replace(/\[Verified\]/g,'<span style="display:inline-flex;align-items:center;background:#f0fdf4;color:#15803d;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;border:1px solid #bbf7d0">✓ Verified</span>')
+    .replace(/\[Emerging Evidence\]/g,'<span style="display:inline-flex;align-items:center;background:#fffbeb;color:#92400e;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;border:1px solid #fde68a">⚡ Emerging</span>')
+    .replace(/\[Speculation\]/g,'<span style="display:inline-flex;align-items:center;background:#f5f3ff;color:#6d28d9;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;border:1px solid #ddd6fe">? Speculation</span>')
+    .replace(/⚠️([^\n<]*)/g,'<div style="margin-top:8px;padding:9px 13px;background:#fff7ed;border:1px solid #fed7aa;border-left:3px solid #ea580c;border-radius:6px;color:#9a3412;font-size:12px;line-height:1.5">⚠️$1</div>')
+    .replace(/•/g,'<span style="color:#4f46e5;font-weight:bold;margin-right:3px">•</span>');
+  return html;
+}
+
   return (
     <div style={{display:"flex",justifyContent:isUser?"flex-end":"flex-start",marginBottom:"14px",gap:"8px",alignItems:"flex-start"}}>
       {!isUser && <div style={{width:"30px",height:"30px",borderRadius:"50%",background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"13px",flexShrink:0,marginTop:"2px"}}>🧬</div>}
