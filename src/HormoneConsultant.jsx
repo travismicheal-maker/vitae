@@ -572,17 +572,18 @@ export default function HormoneAIConsultant() {
 
   const removeDoc = (i) => setUploadedDocs(prev => prev.filter((_,j) => j !== i));
 
-  const sendMessage = async (text) => {
-    const userMsg = text || input;
-    if (!userMsg.trim() || loading) return;
-    setInput("");
-    setShowTopics(false);
-    if (activeView !== "chat") setActiveView("chat");
-    const newMessages = [...messages, {role:"user", content:userMsg}];
-    setMessages(newMessages);
-    setLoading(true);
-    try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+  const response = await fetch("/api/chat", {
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+    model:"claude-sonnet-4-6",
+    max_tokens:1000,
+    system:buildSystemPrompt(),
+    messages:newMessages.map(m=>({role:m.role,content:m.content}))
+  })
+});
+const data = await response.json();
+const reply = data.mergedText || data.content?.[0]?.text || "Connection error — please try again.";
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({
