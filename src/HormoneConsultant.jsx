@@ -307,8 +307,8 @@ RESPONSE FORMAT REQUIREMENTS
 - Use math/statistics when explaining concepts (ratios, percentages, reference ranges)
 - When responding to men: use male-specific reference ranges, dosing, and monitoring parameters
 - When responding to women: use female-specific reference ranges, dosing, and monitoring parameters
-- End all clinical/treatment questions with: ⚠️ Always work with a qualified hormone specialist for personalized evaluation and treatment.`
-`;
+- End all clinical/treatment questions with: ⚠️ Always work with a qualified hormone specialist for personalized evaluation and treatment.`;
+
 
 
 // ─── Data ───────────────────────────────────────────────────────────────────
