@@ -1017,7 +1017,9 @@ I'll now generate your personalized peptide recommendations. Ask me anything abo
 }
 
 function Setup({ onDone }) {
-  const [name, setName] = useState('');
+  const [age, setAge] = useState('');
+  const [sex, setSex] = useState('');
+  const ready = age.trim() && sex;
   return (
     <div style={{minHeight:'100vh',background:'#f0f4ff',display:'flex',alignItems:'flex-start',justifyContent:'center',paddingTop:'28px',paddingLeft:'24px',paddingRight:'24px',paddingBottom:'24px'}}>
       <div style={{background:'#ffffff',borderRadius:16,padding:'36px 28px',maxWidth:440,width:'100%',boxShadow:'0 4px 24px rgba(0,0,0,0.08)'}}>
@@ -1026,11 +1028,11 @@ function Setup({ onDone }) {
           <span style={{fontSize:26,fontWeight:700,color:'#1B4332',fontFamily:"'Playfair Display',Georgia,serif"}}>Vitae</span>
         </div>
         <p style={{fontSize:15,color:'#6B7280',marginBottom:24,lineHeight:1.6}}>
-          Your personal health AI. Enter your name to get started — no account or API key needed.
+          Your personal health AI. Enter your details to get started — no account or API key needed.
         </p>
         <div style={{background:'#eff6ff',border:'1px solid #bfdbfe',borderRadius:12,padding:'16px',marginBottom:24}}>
-          <div style={{fontWeight:600,fontSize:13,color:'#1B4332',marginBottom:8}}>✓ What you can do</div>
-          <div style={{fontSize:13,color:'#2D6A4F',lineHeight:1.8}}>
+          <div style={{fontWeight:600,fontSize:13,color:'#1e40af',marginBottom:8}}>✓ What you can do</div>
+          <div style={{fontSize:13,color:'#1d4ed8',lineHeight:1.8}}>
             • Upload lab results, imaging, or any medical document<br/>
             • Get AI analysis with flagged values highlighted<br/>
             • Ask health questions with cited clinical guidelines<br/>
@@ -1040,23 +1042,35 @@ function Setup({ onDone }) {
           </div>
         </div>
         <div style={{marginBottom:16}}>
-          <label style={{display:'block',fontSize:11,fontWeight:700,letterSpacing:'0.08em',color:'#374151',marginBottom:6,textTransform:'uppercase'}}>Your Name</label>
+          <label style={{display:'block',fontSize:11,fontWeight:700,letterSpacing:'0.08em',color:'#374151',marginBottom:6,textTransform:'uppercase'}}>Your Age</label>
           <input
-            value={name}
-            onChange={e=>setName(e.target.value)}
-            placeholder="e.g. Alex Johnson"
-            onKeyDown={e=>e.key==='Enter'&&name.trim()&&onDone(name.trim())}
+            value={age}
+            onChange={e=>setAge(e.target.value.replace(/\D/g,''))}
+            placeholder="e.g. 52"
+            maxLength={3}
+            inputMode="numeric"
+            onKeyDown={e=>e.key==='Enter'&&ready&&onDone(`${sex}, Age ${age}`)}
             style={{width:'100%',padding:'12px 14px',fontSize:15,border:'1.5px solid #bfdbfe',borderRadius:10,outline:'none',boxSizing:'border-box',color:'#111827',background:'#fff',fontFamily:'inherit'}}
             onFocus={e=>e.target.style.borderColor='#60a5fa'}
             onBlur={e=>e.target.style.borderColor='#bfdbfe'}
           />
         </div>
+        <div style={{marginBottom:24}}>
+          <label style={{display:'block',fontSize:11,fontWeight:700,letterSpacing:'0.08em',color:'#374151',marginBottom:10,textTransform:'uppercase'}}>Biological Sex</label>
+          <div style={{display:'flex',gap:10}}>
+            {['Male','Female'].map(s=>(
+              <button key={s} onClick={()=>setSex(s)} style={{flex:1,padding:'13px',fontSize:15,fontWeight:600,border:`2px solid ${sex===s?'#2D6A4F':'#bfdbfe'}`,borderRadius:10,cursor:'pointer',background:sex===s?'#2D6A4F':'#fff',color:sex===s?'#fff':'#374151',transition:'all 0.15s',fontFamily:'inherit'}}>
+                {s==='Male'?'♂ Male':'♀ Female'}
+              </button>
+            ))}
+          </div>
+        </div>
         <button
-          onClick={()=>name.trim()&&onDone(name.trim())}
-          disabled={!name.trim()}
-          style={{width:'100%',padding:'14px',fontSize:15,fontWeight:600,color:'#fff',background:name.trim()?'#2D6A4F':'#9CA3AF',border:'none',borderRadius:10,cursor:name.trim()?'pointer':'not-allowed',transition:'background 0.2s',fontFamily:'inherit'}}
-          onMouseEnter={e=>{if(name.trim())e.target.style.background='#1B4332';}}
-          onMouseLeave={e=>{if(name.trim())e.target.style.background='#2D6A4F';}}
+          onClick={()=>ready&&onDone(`${sex}, Age ${age}`)}
+          disabled={!ready}
+          style={{width:'100%',padding:'14px',fontSize:15,fontWeight:600,color:'#fff',background:ready?'#2D6A4F':'#9CA3AF',border:'none',borderRadius:10,cursor:ready?'pointer':'not-allowed',transition:'background 0.2s',fontFamily:'inherit'}}
+          onMouseEnter={e=>{if(ready)e.target.style.background='#1B4332';}}
+          onMouseLeave={e=>{if(ready)e.target.style.background='#2D6A4F';}}
         >
           Get Started →
         </button>
@@ -1356,7 +1370,7 @@ export default function Vitae() {
   const fileRef = useRef(null);
 
   useEffect(()=>{
-    if(name&&!msgs) setMsgs([{role:'assistant',content:`Hello **${name}**! I'm Vitae AI.\n\nUpload records in the Records tab and I can see all your values — no copy-pasting needed. I'll give you [Verified] evidence-based guidance from recognized clinical guidelines.\n\nWhat would you like to know?`}]);
+    if(name&&!msgs) setMsgs([{role:'assistant',content:`Hello! I'm Vitae AI — personalized for **${name}**.\n\nUpload records in the Records tab and I can see all your values — no copy-pasting needed. I'll give you [Verified] evidence-based guidance from recognized clinical guidelines.\n\nWhat would you like to know?`}]);
   },[name]);
   useEffect(()=>{endRef.current?.scrollIntoView({behavior:'smooth'});},[msgs,busy]);
   useEffect(()=>{
@@ -1609,7 +1623,7 @@ export default function Vitae() {
           <div className="desk-topbar">
             <div>
               <div className="desk-page-title">
-                {page==='home'?`Good morning, ${name.split(' ')[0]}`:{records:'My Records',ai:'AI Consultant',peptide:'Peptide Consultant',hormone:'Hormone Consultant',profile:'Profile'}[page]}
+                {page==='home'?`Good morning`:{records:'My Records',ai:'AI Consultant',peptide:'Peptide Consultant',hormone:'Hormone Consultant',profile:'Profile'}[page]}
               </div>
               <div className="desk-page-sub">
                 {{home:'Your health records at a glance',records:'Labs, imaging & notes',peptide:'Personalized peptide recommendations',ai:uploads.length>0?`Seeing ${uploads.length} uploaded record${uploads.length!==1?'s':''}` :'Upload records so AI can reference them',profile:'Your session'}[page]}
