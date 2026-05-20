@@ -543,11 +543,11 @@ export default function HormoneAIConsultant() {
       } else if (isPDF || isImage) {
         const b64 = await toBase64(file);
         // For PDFs/images, use Claude to extract text via the API
-        const resp = await fetch("https://api.anthropic.com/v1/messages", {
+        const resp = await fetch("/api/chat", {
           method:"POST",
           headers:{"Content-Type":"application/json"},
           body:JSON.stringify({
-            model:"claude-sonnet-4-20250514",
+            model:"claude-sonnet-4-6",
             max_tokens:2000,
             messages:[{
               role:"user",
@@ -560,7 +560,7 @@ export default function HormoneAIConsultant() {
           })
         });
         const data = await resp.json();
-        const extracted = data.content?.[0]?.text || "Could not extract text.";
+        const extracted = data.mergedText || data.content?.[0]?.text || "Could not extract text.";
         setUploadedDocs(prev => [...prev, { name:file.name, type:isPDF?"pdf":"image", text:extracted }]);
       }
     } catch (err) {
@@ -572,29 +572,28 @@ export default function HormoneAIConsultant() {
 
   const removeDoc = (i) => setUploadedDocs(prev => prev.filter((_,j) => j !== i));
 
-  const response = await fetch("/api/chat", {
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({
-    model:"claude-sonnet-4-6",
-    max_tokens:1000,
-    system:buildSystemPrompt(),
-    messages:newMessages.map(m=>({role:m.role,content:m.content}))
-  })
-});
-const data = await response.json();
-const reply = data.mergedText || data.content?.[0]?.text || "Connection error — please try again.";
+  const sendMessage = async (text) => {
+    const userMsg = text || input;
+    if (!userMsg.trim() || loading) return;
+    setInput("");
+    setShowTopics(false);
+    if (activeView !== "chat") setActiveView("chat");
+    const newMessages = [...messages, {role:"user", content:userMsg}];
+    setMessages(newMessages);
+    setLoading(true);
+    try {
+      const response = await fetch("/api/chat", {
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({
-          model:"claude-sonnet-4-20250514",
+          model:"claude-sonnet-4-6",
           max_tokens:1000,
           system:buildSystemPrompt(),
           messages:newMessages.map(m=>({role:m.role,content:m.content}))
         })
       });
       const data = await response.json();
-      const reply = data.content?.[0]?.text || "Connection error — please try again.";
+      const reply = data.mergedText || data.content?.[0]?.text || "Connection error — please try again.";
       setMessages([...newMessages, {role:"assistant",content:reply}]);
     } catch {
       setMessages([...newMessages, {role:"assistant",content:"Connection error — please try again."}]);
