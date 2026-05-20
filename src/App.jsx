@@ -253,18 +253,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx)}
 /* ── Message bubbles ── */
 .msg{max-width:80%}.msg.u{align-self:flex-end}.msg.a{align-self:flex-start}
 .mrole{font-size:10.5px;color:var(--mu);margin-bottom:4px;font-weight:500;letter-spacing:.3px}
-.mb{padding:14px 16px;border-radius:14px;font-size:14px;line-height:1.58;font-family:'DM Sans',sans-serif}
+.mb{padding:14px 16px;border-radius:14px;font-size:14px;line-height:1.4;font-family:'DM Sans',sans-serif}
 .msg.u .mb{background:var(--g9);color:#fff;border-bottom-right-radius:3px}
 .msg.a .mb{background:var(--surf);border:1px solid var(--bd);border-bottom-left-radius:3px;box-shadow:var(--sh);padding:16px 18px}
 
 /* ── Clinical typography — PATCHED SPACING ── */
-.md-p{margin:0 0 9px}
+.md-p{margin:0 0 4px}
 .md-p:last-child{margin-bottom:0}
 .md-p:empty{display:none}
 .md-section{font-weight:600;font-size:14px;color:var(--tx);margin:10px 0 3px;letter-spacing:-.1px}
-.md-bullet{display:flex;gap:9px;margin:2px 0;line-height:1.5}
+.md-bullet{display:flex;gap:8px;margin:1px 0;line-height:1.38}
 .md-dot{color:var(--g5);flex-shrink:0;margin-top:2px;font-size:15px;line-height:1.4}
-.md-num{display:flex;gap:9px;margin:2px 0;line-height:1.5}
+.md-num{display:flex;gap:8px;margin:1px 0;line-height:1.38}
 .md-num-n{color:var(--mu);flex-shrink:0;font-size:12px;margin-top:3px;min-width:16px;font-weight:500}
 .md-p:has(>.md-bullet){margin:0}
 .md-p:has(>.md-num){margin:0}
@@ -483,50 +483,146 @@ function ShareModal({ content, onClose }) {
 
 // ── PDF Generation ────────────────────────────────────────────────────────────
 function generatePDF(content, question) {
-  const plain = content
-    .replace(/<div class="ref-box">[\s\S]*<\/div>/,'')
-    .replace(/<[^>]+>/g,'\n')
-    .replace(/\n{3,}/g,'\n\n')
-    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
-    .trim();
+  // Step 1 — strip HTML to structured plain text, removing markdown artifacts
+  const processHTML = (html) => {
+    return html
+      .replace(/<div class="ref-box">[\s\S]*?<\/div>/g, '')
+      .replace(/<div class="md-section">([\s\S]*?)<\/div>/g, '\n§HEADING§$1\n')
+      .replace(/<div class="md-bullet">[\s\S]*?<span class="md-dot">.*?<\/span><span>([\s\S]*?)<\/span><\/div>/g, '§BULLET§$1\n')
+      .replace(/<div class="md-num"><span class="md-num-n">(.*?)<\/span><span>([\s\S]*?)<\/span><\/div>/g, '§NUM§$1 $2\n')
+      .replace(/<div class="md-disc">([\s\S]*?)<\/div>/g, '\n§DISC§$1\n')
+      .replace(/<span class="grade[^"]*">\[(.*?)\]<\/span>/g, '[$1]')
+      .replace(/<strong>([\s\S]*?)<\/strong>/g, '$1')
+      .replace(/<em>([\s\S]*?)<\/em>/g, '$1')
+      .replace(/<br\/>/g, '\n')
+      .replace(/<p class="md-p">/g, '')
+      .replace(/<\/p>/g, '\n')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  };
 
-  const now = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const processed = processHTML(content);
+  const now = new Date().toLocaleDateString('en-US', {year:'numeric', month:'long', day:'numeric'});
+  const time = new Date().toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
 
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Vitae Clinical Analysis</title>
+  // Step 2 — convert token lines to HTML blocks
+  const lines = processed.split('\n');
+  let bodyHTML = '';
+  let inBulletGroup = false;
+
+  lines.forEach((line, idx) => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      if (inBulletGroup) { bodyHTML += '</ul>'; inBulletGroup = false; }
+      bodyHTML += '<div style="height:8px"></div>';
+      return;
+    }
+    if (trimmed.startsWith('§HEADING§')) {
+      if (inBulletGroup) { bodyHTML += '</ul>'; inBulletGroup = false; }
+      bodyHTML += `<div class="pdf-section-head">${trimmed.slice(9)}</div>`;
+    } else if (trimmed.startsWith('§BULLET§')) {
+      if (!inBulletGroup) { bodyHTML += '<ul class="pdf-list">'; inBulletGroup = true; }
+      bodyHTML += `<li>${trimmed.slice(8)}</li>`;
+    } else if (trimmed.startsWith('§NUM§')) {
+      if (inBulletGroup) { bodyHTML += '</ul>'; inBulletGroup = false; }
+      bodyHTML += `<div class="pdf-num-item">${trimmed.slice(5)}</div>`;
+    } else if (trimmed.startsWith('§DISC§')) {
+      if (inBulletGroup) { bodyHTML += '</ul>'; inBulletGroup = false; }
+      bodyHTML += `<div class="pdf-disclaimer-inline">${trimmed.slice(6)}</div>`;
+    } else if (trimmed.match(/^\[Verified.*?\]$|^\[Speculation\]$|^\[Emerging.*?\]$|^\[Unknown\]$/)) {
+      bodyHTML += `<span class="pdf-grade">${trimmed}</span> `;
+    } else {
+      if (inBulletGroup) { bodyHTML += '</ul>'; inBulletGroup = false; }
+      bodyHTML += `<p class="pdf-body">${trimmed}</p>`;
+    }
+  });
+  if (inBulletGroup) bodyHTML += '</ul>';
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Vitae Health AI — Clinical Summary</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap');
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'DM Sans',sans-serif;font-size:13px;color:#111827;background:#fff;padding:48px;max-width:720px;margin:0 auto;line-height:1.7}
-  .header{border-bottom:2px solid #1B4332;padding-bottom:18px;margin-bottom:24px}
-  .brand{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#1B4332}
-  .brand-sub{font-size:11px;color:#6B7280;margin-top:3px;letter-spacing:.3px}
-  .date{font-size:11px;color:#6B7280;margin-top:8px}
-  .query-box{background:#F0FDF4;border-left:3px solid #52B788;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:22px;font-size:13px;color:#1B4332;font-style:italic}
-  .query-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#2D6A4F;margin-bottom:5px}
-  .body{white-space:pre-wrap;font-size:13px;line-height:1.75;color:#1F2937}
-  .footer{margin-top:32px;padding-top:14px;border-top:1px solid #E5E1D8;font-size:10.5px;color:#9CA3AF;line-height:1.6}
-  .powered{margin-top:8px;font-size:11px;color:#2D6A4F;font-weight:500}
-</style></head><body>
-<div class="header">
-  <div class="brand">Vitae Health AI</div>
-  <div class="brand-sub">Powered by Bio Precision Aging · bioprecisionaging.com</div>
-  <div class="date">Generated ${now}</div>
-</div>
-<div class="query-lbl">Clinical Query</div>
-<div class="query-box">${question || 'Clinical analysis'}</div>
-<div class="body">${plain}</div>
-<div class="footer">
-  This report was generated by Vitae AI, a clinical decision-support tool powered by Claude AI and grounded in GRADE evidence methodology.<br/>
-  For educational and clinical decision-support purposes only. All management decisions should be made in the context of the full clinical picture by the treating clinician.
-  <div class="powered">Bio Precision Aging · bioprecisionaging.com</div>
-</div>
-</body></html>`;
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: #111827; background: #fff; padding: 48px 56px; max-width: 800px; margin: 0 auto; line-height: 1.55; }
+
+  /* ── Header ── */
+  .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 16px; margin-bottom: 22px; border-bottom: 2.5px solid #1B4332; }
+  .pdf-brand { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #1B4332; }
+  .pdf-brand-sub { font-size: 10.5px; color: #6B7280; margin-top: 4px; letter-spacing: 0.3px; }
+  .pdf-meta-label { font-size: 9.5px; font-weight: 700; color: #1B4332; text-transform: uppercase; letter-spacing: 0.9px; margin-bottom: 3px; text-align: right; }
+  .pdf-meta-date { font-size: 11px; color: #6B7280; text-align: right; }
+
+  /* ── Query box ── */
+  .pdf-query-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #6B7280; margin-bottom: 7px; }
+  .pdf-query-box { background: #F8FFF8; border-left: 3px solid #52B788; padding: 11px 15px; border-radius: 0 7px 7px 0; font-size: 12.5px; color: #1B4332; font-style: italic; line-height: 1.55; margin-bottom: 22px; }
+  .pdf-divider { border: none; border-top: 1px solid #E5E1D8; margin: 20px 0; }
+
+  /* ── Content ── */
+  .pdf-section-head { font-family: 'Playfair Display', serif; font-size: 13.5px; font-weight: 600; color: #1B4332; margin: 20px 0 8px; padding-bottom: 5px; border-bottom: 1px solid #E5E1D8; }
+  .pdf-body { font-size: 12.5px; color: #1F2937; line-height: 1.6; margin-bottom: 7px; }
+  .pdf-list { margin: 5px 0 5px 18px; }
+  .pdf-list li { font-size: 12.5px; color: #1F2937; line-height: 1.55; margin-bottom: 4px; padding-left: 4px; }
+  .pdf-num-item { font-size: 12.5px; color: #1F2937; line-height: 1.55; margin: 3px 0 3px 18px; }
+  .pdf-grade { display: inline-block; font-size: 9.5px; font-weight: 700; padding: 1px 7px; border-radius: 4px; background: #D1FAE5; color: #065F46; margin: 2px 0; }
+  .pdf-disclaimer-inline { font-size: 11.5px; color: #1E40AF; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 7px; padding: 9px 12px; margin: 12px 0; line-height: 1.55; }
+
+  /* ── Footer ── */
+  .pdf-footer { margin-top: 40px; padding-top: 14px; border-top: 1px solid #E5E1D8; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
+  .pdf-footer-disclaimer { font-size: 10px; color: #9CA3AF; line-height: 1.65; flex: 1; }
+  .pdf-footer-brand { font-size: 11px; font-weight: 600; color: #2D6A4F; margin-top: 5px; }
+  .pdf-footer-date { font-size: 10px; color: #9CA3AF; white-space: nowrap; text-align: right; }
+
+  @media print {
+    body { padding: 32px 40px; }
+    .pdf-section-head { page-break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="pdf-header">
+    <div>
+      <div class="pdf-brand">Vitae Health AI</div>
+      <div class="pdf-brand-sub">Clinical Decision Support · Bio Precision Aging · bioprecisionaging.com</div>
+    </div>
+    <div>
+      <div class="pdf-meta-label">AI Clinical Summary</div>
+      <div class="pdf-meta-date">${now} · ${time}</div>
+    </div>
+  </div>
+
+  ${question ? `
+  <div class="pdf-query-label">Clinical Query</div>
+  <div class="pdf-query-box">${question}</div>
+  <hr class="pdf-divider"/>
+  ` : ''}
+
+  <div class="pdf-content">
+    ${bodyHTML}
+  </div>
+
+  <div class="pdf-footer">
+    <div>
+      <div class="pdf-footer-disclaimer">
+        This summary was generated by Vitae AI, a clinical decision-support tool powered by Claude AI and grounded in GRADE evidence methodology. It is intended for educational and clinical decision-support purposes only. All management decisions should be made in context of the full clinical picture by the treating clinician.
+      </div>
+      <div class="pdf-footer-brand">Bio Precision Aging · bioprecisionaging.com</div>
+    </div>
+    <div class="pdf-footer-date">Generated ${now}</div>
+  </div>
+
+</body>
+</html>`;
 
   const blob = new Blob([html], { type: 'text/html' });
   const url  = URL.createObjectURL(blob);
   const win  = window.open(url, '_blank');
-  if(win) { win.onload = () => { win.print(); }; }
+  if (win) { win.onload = () => { win.print(); }; }
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 
@@ -923,7 +1019,7 @@ I'll now generate your personalized peptide recommendations. Ask me anything abo
 function Setup({ onDone }) {
   const [name, setName] = useState('');
   return (
-    <div style={{minHeight:'100vh',background:'#f9fafb',display:'flex',alignItems:'center',justifyContent:'center',padding:'24px'}}>
+    <div style={{minHeight:'100vh',background:'#f0f4ff',display:'flex',alignItems:'flex-start',justifyContent:'center',paddingTop:'28px',paddingLeft:'24px',paddingRight:'24px',paddingBottom:'24px'}},justifyContent:'center'>
       <div style={{background:'#ffffff',borderRadius:16,padding:'36px 28px',maxWidth:440,width:'100%',boxShadow:'0 4px 24px rgba(0,0,0,0.08)'}}>
         <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:10}}>
           <Heart size={28} style={{color:'#52B788'}} fill="#52B788"/>
@@ -932,7 +1028,7 @@ function Setup({ onDone }) {
         <p style={{fontSize:15,color:'#6B7280',marginBottom:24,lineHeight:1.6}}>
           Your personal health AI. Enter your name to get started — no account or API key needed.
         </p>
-        <div style={{background:'#F0FDF4',border:'1px solid #D1FAE5',borderRadius:12,padding:'16px',marginBottom:24}}>
+        <div style={{background:'#eff6ff',border:'1px solid #bfdbfe',borderRadius:12,padding:'16px',marginBottom:24}}>
           <div style={{fontWeight:600,fontSize:13,color:'#1B4332',marginBottom:8}}>✓ What you can do</div>
           <div style={{fontSize:13,color:'#2D6A4F',lineHeight:1.8}}>
             • Upload lab results, imaging, or any medical document<br/>
@@ -950,9 +1046,9 @@ function Setup({ onDone }) {
             onChange={e=>setName(e.target.value)}
             placeholder="e.g. Alex Johnson"
             onKeyDown={e=>e.key==='Enter'&&name.trim()&&onDone(name.trim())}
-            style={{width:'100%',padding:'12px 14px',fontSize:15,border:'1.5px solid #D1FAE5',borderRadius:10,outline:'none',boxSizing:'border-box',color:'#111827',background:'#fff',fontFamily:'inherit'}}
-            onFocus={e=>e.target.style.borderColor='#52B788'}
-            onBlur={e=>e.target.style.borderColor='#D1FAE5'}
+            style={{width:'100%',padding:'12px 14px',fontSize:15,border:'1.5px solid #bfdbfe',borderRadius:10,outline:'none',boxSizing:'border-box',color:'#111827',background:'#fff',fontFamily:'inherit'}}
+            onFocus={e=>e.target.style.borderColor='#60a5fa'}
+            onBlur={e=>e.target.style.borderColor='#bfdbfe'}
           />
         </div>
         <button
@@ -1010,8 +1106,8 @@ function HomeContent({name, allRecs, flagCount, uploads, setPage, isMobile}) {
         ))}
       </div>
       <div style={{background:'#F0FDF4',border:'1px solid #D1FAE5',borderRadius:'var(--rd)',padding:'16px',marginBottom:isMobile?24:0}}>
-        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:600,color:'#1B4332',marginBottom:8}}>Upload a Medical Record</div>
-        <div style={{fontSize:13,color:'#2D6A4F',lineHeight:1.55,marginBottom:12}}>Add any lab result, imaging report, or medical document. Claude AI reads and categorizes it automatically.</div>
+        <div style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:600,color:'#1e40af',marginBottom:8}}>Upload a Medical Record</div>
+        <div style={{fontSize:13,color:'#1d4ed8',lineHeight:1.55,marginBottom:12}}>Add any lab result, imaging report, or medical document. Claude AI reads and categorizes it automatically.</div>
         <button className="btn btnP" style={{fontSize:13,padding:'8px 16px'}} onClick={()=>setPage('records')}><Upload size={13}/>Go to Records</button>
       </div>
     </div>
@@ -1204,7 +1300,7 @@ function ChatContent({msgs, busy, input, setInput, send, QUICK_QS, endRef, isMob
 function ProfileContent({name, initials, setName, uploads, setPage}) {
   return (
     <div style={{maxWidth:560}}>
-      <div style={{display:'flex',alignItems:'center',gap:14,padding:'20px',background:'linear-gradient(135deg,#1B4332,#2D6A4F)',borderRadius:'var(--rd)',marginBottom:16,color:'#fff'}}>
+      <div style={{display:'flex',alignItems:'center',gap:14,padding:'20px',background:'linear-gradient(135deg,#1B4332,#1d4ed8)',borderRadius:'var(--rd)',marginBottom:16,color:'#fff'}}>
         <div style={{width:52,height:52,borderRadius:'50%',background:'#52B788',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,fontWeight:700,flexShrink:0}}>{initials}</div>
         <div style={{flex:1}}>
           <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:600}}>{name}</div>
